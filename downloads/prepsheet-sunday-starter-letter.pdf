@@ -13,10 +13,10 @@ endobj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-BoldOblique /Encoding /WinAnsiEncoding >>
 endobj
 5 0 obj
-<< /Type /Pages /Kids [7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R] /Count 6 >>
+<< /Type /Pages /Kids [8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 19 0 R] /Count 6 >>
 endobj
 6 0 obj
-<< /Length 3047 >>
+<< /Length 3086 >>
 stream
 q
 0.04 0.4 0.33 rg
@@ -190,15 +190,18 @@ ET
 BT
 0.42 0.45 0.46 rg
 /F1 8 Tf
-1 0 0 1 441.944 37.12 Tm
-(Printable planners for busy parents) Tj
+1 0 0 1 300.128 37.12 Tm
+(steffanbloem2024-ship-it.github.io/printable-weekly-meal-prep-planner-pdfs) Tj
 ET
 endstream
 endobj
 7 0 obj
-<< /Type /Page /Parent 5 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 6 0 R >>
+<< /Type /Annot /Subtype /Link /Rect [300.128 34 566 46] /Border [0 0 0] /A << /Type /Action /S /URI /URI (https://steffanbloem2024-ship-it.github.io/printable-weekly-meal-prep-planner-pdfs/) >> >>
 endobj
 8 0 obj
+<< /Type /Page /Parent 5 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 6 0 R /Annots [7 0 R] >>
+endobj
+9 0 obj
 << /Length 6418 >>
 stream
 BT
@@ -547,10 +550,10 @@ BT
 ET
 endstream
 endobj
-9 0 obj
-<< /Type /Page /Parent 5 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 8 0 R >>
-endobj
 10 0 obj
+<< /Type /Page /Parent 5 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 9 0 R >>
+endobj
+11 0 obj
 << /Length 4290 >>
 stream
 BT
@@ -919,10 +922,10 @@ BT
 ET
 endstream
 endobj
-11 0 obj
-<< /Type /Page /Parent 5 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 10 0 R >>
-endobj
 12 0 obj
+<< /Type /Page /Parent 5 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 11 0 R >>
+endobj
+13 0 obj
 << /Length 23021 >>
 stream
 BT
@@ -2554,10 +2557,10 @@ BT
 ET
 endstream
 endobj
-13 0 obj
-<< /Type /Page /Parent 5 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 12 0 R >>
-endobj
 14 0 obj
+<< /Type /Page /Parent 5 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 13 0 R >>
+endobj
+15 0 obj
 << /Length 8087 >>
 stream
 BT
@@ -3128,11 +3131,11 @@ BT
 ET
 endstream
 endobj
-15 0 obj
-<< /Type /Page /Parent 5 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 14 0 R >>
-endobj
 16 0 obj
-<< /Length 4931 >>
+<< /Type /Page /Parent 5 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 15 0 R >>
+endobj
+17 0 obj
+<< /Length 7006 >>
 stream
 BT
 0.42 0.62 0.56 rg
@@ -3349,15 +3352,15 @@ BT
 ET
 q
 0.933 0.957 0.949 rg
-50 291.8 m
-562 291.8 l
-564.209 291.8 566 293.591 566 295.8 c
+50 269.8 m
+562 269.8 l
+564.209 269.8 566 271.591 566 273.8 c
 566 373.8 l
 566 376.009 564.209 377.8 562 377.8 c
 50 377.8 l
 47.791 377.8 46 376.009 46 373.8 c
-46 295.8 l
-46 293.591 47.791 291.8 50 291.8 c
+46 273.8 l
+46 271.591 47.791 269.8 50 269.8 c
 h
 f
 Q
@@ -3371,9 +3374,107 @@ BT
 0.42 0.45 0.46 rg
 /F1 9.2 Tf
 1 0 0 1 60 335.888 Tm
-(One payment, no subscription, no account to make. Download it, print it, keep it. You will find it on the same page you) Tj
-1 0 0 1 60 323.888 Tm
-(downloaded this free pack from.) Tj
+(One payment, no subscription, no account to make. Download it, print it, keep it.) Tj
+ET
+q
+0.04 0.4 0.33 rg
+73 297.8 m
+419.592 297.8 l
+426.772 297.8 432.592 303.62 432.592 310.8 c
+432.592 310.8 l
+432.592 317.98 426.772 323.8 419.592 323.8 c
+73 323.8 l
+65.82 323.8 60 317.98 60 310.8 c
+60 310.8 l
+60 303.62 65.82 297.8 73 297.8 c
+h
+f
+Q
+BT
+1 1 1 rg
+/F2 9.6 Tf
+1 0 0 1 74 307.044 Tm
+(steffanbloem2024-ship-it.github.io/printable-weekly-meal-prep-planner-pdfs) Tj
+ET
+BT
+0.42 0.45 0.46 rg
+/F3 8 Tf
+1 0 0 1 60 284.92 Tm
+(Type that in, or tap it if you are reading this on a screen.) Tj
+ET
+BT
+0.1 0.14 0.16 rg
+/F2 10.6 Tf
+1 0 0 1 46 242.684 Tm
+(The twenty dinners you would be getting) Tj
+ET
+BT
+0.42 0.45 0.46 rg
+/F1 8.4 Tf
+1 0 0 1 46 229.576 Tm
+(Four complete weeks, already chosen — each with what to do on the night, the prep-ahead step, and a grocery list sorted by aisle.) Tj
+ET
+BT
+0.04 0.4 0.33 rg
+/F2 8.5 Tf
+1 0 0 1 46 208.49 Tm
+(Rotation 1 — The Easy Start Week) Tj
+ET
+BT
+0.42 0.45 0.46 rg
+/F1 8 Tf
+1 0 0 1 46 196.92 Tm
+(Sheet-Pan Chicken Thighs, Potatoes & Green Beans · Taco Night ·) Tj
+1 0 0 1 46 186.72 Tm
+(Pasta with Hidden-Veg Tomato Sauce + Garlic Bread · Beef & Rice) Tj
+1 0 0 1 46 176.52 Tm
+(Burrito Bowls · Pizza Night) Tj
+ET
+BT
+0.04 0.4 0.33 rg
+/F2 8.5 Tf
+1 0 0 1 46 153.89 Tm
+(Rotation 2 — The 20-Minute Week) Tj
+ET
+BT
+0.42 0.45 0.46 rg
+/F1 8 Tf
+1 0 0 1 46 142.32 Tm
+(Honey-Soy Salmon, Rice & Cucumber Salad · Chicken Quesadillas +) Tj
+1 0 0 1 46 132.12 Tm
+(Tomato Soup · Garlic Shrimp Pasta with Peas · Breakfast for Dinner ·) Tj
+1 0 0 1 46 121.92 Tm
+(Teriyaki Chicken Rice Bowls) Tj
+ET
+BT
+0.04 0.4 0.33 rg
+/F2 8.5 Tf
+1 0 0 1 318 208.49 Tm
+(Rotation 3 — The One-Pan Week) Tj
+ET
+BT
+0.42 0.45 0.46 rg
+/F1 8 Tf
+1 0 0 1 318 196.92 Tm
+(One-Pot Chili Mac · Sheet-Pan Sausage, Peppers & Potatoes ·) Tj
+1 0 0 1 318 186.72 Tm
+(One-Pot Creamy Chicken & Orzo · Sheet-Pan Fish Tacos · Big Skillet) Tj
+1 0 0 1 318 176.52 Tm
+(Fried Rice) Tj
+ET
+BT
+0.04 0.4 0.33 rg
+/F2 8.5 Tf
+1 0 0 1 318 153.89 Tm
+(Rotation 4 — The Pantry-First Week) Tj
+ET
+BT
+0.42 0.45 0.46 rg
+/F1 8 Tf
+1 0 0 1 318 142.32 Tm
+(Baked Bean & Cheese Burritos · Lentil Shepherd’s Pie · Egg Fried) Tj
+1 0 0 1 318 132.12 Tm
+(Rice · Pasta e Fagioli · Roast Chicken Thighs with Cabbage & Carrots) Tj
 ET
 BT
 0.42 0.45 0.46 rg
@@ -3404,39 +3505,44 @@ BT
 ET
 endstream
 endobj
-17 0 obj
-<< /Type /Page /Parent 5 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 16 0 R >>
-endobj
 18 0 obj
-<< /Title (The Sunday Starter — free printable meal planner) /Author (PrepSheet) /Subject (Free printable weekly meal planner, grocery list and prep checklist) /Keywords (free printable meal planner, weekly meal plan template, grocery list) /Creator (PrepSheet) /Producer (PrepSheet pdflib) >>
+<< /Type /Annot /Subtype /Link /Rect [60 297.8 432.592 323.8] /Border [0 0 0] /A << /Type /Action /S /URI /URI (https://steffanbloem2024-ship-it.github.io/printable-weekly-meal-prep-planner-pdfs/) >> >>
 endobj
 19 0 obj
+<< /Type /Page /Parent 5 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 17 0 R /Annots [18 0 R] >>
+endobj
+20 0 obj
+<< /Title (The Sunday Starter — free printable meal planner) /Author (PrepSheet) /Subject (Free printable weekly meal planner, grocery list and prep checklist) /Keywords (free printable meal planner, weekly meal plan template, grocery list) /Creator (PrepSheet) /Producer (PrepSheet pdflib) >>
+endobj
+21 0 obj
 << /Type /Catalog /Pages 5 0 R >>
 endobj
 xref
-0 20
+0 22
 0000000000 65535 f 
 0000000017 00000 n 
 0000000114 00000 n 
 0000000216 00000 n 
 0000000321 00000 n 
 0000000430 00000 n 
-0000000521 00000 n 
-0000003620 00000 n 
-0000003776 00000 n 
-0000010246 00000 n 
-0000010402 00000 n 
-0000014745 00000 n 
-0000014903 00000 n 
-0000037978 00000 n 
-0000038136 00000 n 
-0000046276 00000 n 
-0000046434 00000 n 
-0000051418 00000 n 
-0000051576 00000 n 
-0000051886 00000 n 
+0000000522 00000 n 
+0000003660 00000 n 
+0000003873 00000 n 
+0000004045 00000 n 
+0000010515 00000 n 
+0000010672 00000 n 
+0000015015 00000 n 
+0000015173 00000 n 
+0000038248 00000 n 
+0000038406 00000 n 
+0000046546 00000 n 
+0000046704 00000 n 
+0000053763 00000 n 
+0000053982 00000 n 
+0000054157 00000 n 
+0000054467 00000 n 
 trailer
-<< /Size 20 /Root 19 0 R /Info 18 0 R >>
+<< /Size 22 /Root 21 0 R /Info 20 0 R >>
 startxref
-51936
+54517
 %%EOF

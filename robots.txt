@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://steffanbloem2024-ship-it.github.io/printable-weekly-meal-prep-planner-pdfs/sitemap.xml
