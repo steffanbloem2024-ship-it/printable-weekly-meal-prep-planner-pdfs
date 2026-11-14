@@ -291,12 +291,40 @@ details p { margin: 12px 0 0; color: var(--ink-soft); font-size: .96rem; max-wid
 
 .own { margin-top: 22px; background: var(--paper); border: 1px dashed var(--line); border-radius: 12px; padding: 18px 20px; }
 .own label { display: block; font-weight: 600; font-size: .95rem; margin-bottom: 8px; }
-.own-row { display: flex; gap: 10px; flex-wrap: wrap; }
-.own-row input {
-  font: inherit; flex: 1 1 240px; padding: 11px 14px;
+.own h3 { font-family: var(--serif); font-size: 1.12rem; margin: 0 0 6px; }
+.own .step-note { margin-top: 0; }
+.own-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+.own-lab { display: block; font-weight: 600; font-size: .95rem; margin-bottom: 6px; }
+.own-lab .fine { font-weight: 400; color: var(--ink-faint); }
+.own-row input, .own-row textarea {
+  font: inherit; width: 100%; padding: 11px 14px;
   border: 1px solid var(--line); border-radius: 10px; background: var(--cream); color: var(--ink);
 }
-.own-row input:focus { outline: 2px solid var(--green-soft); outline-offset: 1px; }
+.own-row textarea { resize: vertical; line-height: 1.5; }
+.own-row input:focus, .own-row textarea:focus { outline: 2px solid var(--green-soft); outline-offset: 1px; }
+.own-row-btn { margin: 2px 0 12px; }
+.own code, .note code {
+  font-size: .86em; background: var(--pale); color: var(--green-dark);
+  padding: 1px 6px; border-radius: 5px;
+}
+
+/* "Your dinners" — the family's own, typed in and kept in their browser */
+.own-bank { margin-top: 26px; }
+.own-bank h3 { font-family: var(--serif); font-size: 1.12rem; margin: 0 0 10px; }
+.dcard.is-own {
+  display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start;
+  padding: 13px 13px 11px 16px; cursor: default;
+}
+.dcard.is-own:hover { transform: none; }
+.dcard-pick {
+  font: inherit; text-align: left; color: inherit; cursor: pointer;
+  background: none; border: 0; padding: 2px 0; width: 100%;
+}
+.dcard.is-own .dmeta .time { background: #f6efdf; color: #7a6a44; }
+.linkish {
+  font: inherit; background: none; border: 0; padding: 0;
+  color: var(--green-dark); text-decoration: underline; cursor: pointer;
+}
 
 .chosen { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-width: 760px; }
 .crow {

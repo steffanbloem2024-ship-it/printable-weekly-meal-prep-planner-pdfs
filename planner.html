@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Free weekly dinner planner &mdash; pick 5 dinners, get the grocery list | PrepSheet</title>
-<meta name="description" content="A free weekly dinner planner that works in your browser: choose five family dinners, and it writes the aisle-sorted grocery list and the Sunday prep list for you. No signup, no email, nothing stored on a server. Print it for the fridge.">
+<title>Free weekly dinner planner with your own recipes &mdash; get the grocery list | PrepSheet</title>
+<meta name="description" content="A free weekly dinner planner that works in your browser: choose five family dinners from ours or type in your own with their ingredients, and it writes the aisle-sorted grocery list and the Sunday prep list for you. No signup, no email, nothing stored on a server. Print it for the fridge.">
 <link rel="stylesheet" href="styles.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta property="og:title" content="Free weekly dinner planner — pick 5 dinners, get the grocery list">
-<meta property="og:description" content="Choose five family dinners and this free planner writes your aisle-sorted grocery list and Sunday prep list. No signup. Print it for the fridge.">
+<meta property="og:description" content="Choose five family dinners — ours or your own, with their ingredients — and this free planner writes your aisle-sorted grocery list and Sunday prep list. No signup. Print it for the fridge.">
 <meta property="og:type" content="website">
 <link rel="canonical" href="https://steffanbloem2024-ship-it.github.io/printable-weekly-meal-prep-planner-pdfs/planner.html">
 <meta property="og:url" content="https://steffanbloem2024-ship-it.github.io/printable-weekly-meal-prep-planner-pdfs/planner.html">
@@ -22,7 +22,7 @@
   "applicationCategory": "LifestyleApplication",
   "operatingSystem": "Any browser",
   "browserRequirements": "Requires JavaScript",
-  "description": "A free weekly dinner planner: choose five family dinners and it builds the aisle-sorted grocery list and the Sunday prep list, ready to print for the fridge. Runs entirely in the browser with no account and no data sent anywhere.",
+  "description": "A free weekly dinner planner: choose five family dinners from twenty worked examples or type in your own with their ingredients, and it builds one merged, aisle-sorted grocery list and the Sunday prep list, ready to print for the fridge. Runs entirely in the browser with no account and no data sent anywhere.",
   "isAccessibleForFree": true,
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "publisher": { "@type": "Organization", "name": "PrepSheet" }
@@ -55,9 +55,9 @@
   <div class="wrap narrow center">
     <span class="eyebrow">Free &middot; no signup &middot; nothing leaves your browser</span>
     <h1>Build next week&rsquo;s dinners.</h1>
-    <p class="lede">Pick five dinners. This page writes the aisle-sorted grocery list and the
-      Sunday prep list for you, then prints the whole thing for the fridge.
-      Two nights stay blank <strong>on purpose</strong>.</p>
+    <p class="lede">Pick five dinners &mdash; ours, your own, or a mix. This page writes the
+      aisle-sorted grocery list and the Sunday prep list for you, then prints the whole thing for
+      the fridge. Two nights stay blank <strong>on purpose</strong>.</p>
   </div>
 </section>
 
@@ -77,8 +77,9 @@
 
     <div class="step">
       <h2><span class="num">1</span> Choose five dinners</h2>
-      <p class="step-note">These are the twenty dinners from the Starter Rotations. Tap to add.
-        Already know what you&rsquo;re cooking? Type your own at the bottom.</p>
+      <p class="step-note">These are the twenty dinners from the Starter Rotations &mdash; tap to add.
+        Already cook your own? Type them in underneath, with their ingredients, and they are merged
+        into the same grocery list and saved for next week.</p>
 
       <div class="tool-bar">
         <div class="counter" id="counter" aria-live="polite">0 of 5 chosen</div>
@@ -105,13 +106,32 @@
       <div class="dinner-grid" id="grid"></div>
 
       <div class="own">
-        <label for="own-input">Add your own dinner</label>
+        <h3>Or add your own dinner</h3>
+        <p class="step-note">Most of a real week is your family&rsquo;s own dinners, not ours. Type one
+          in with its ingredients and it joins the same merged, aisle-sorted list &mdash; and it stays
+          in <strong>your dinners</strong> underneath, ready for next week.</p>
         <div class="own-row">
+          <label class="own-lab" for="own-input">Dinner name</label>
           <input id="own-input" type="text" maxlength="60" placeholder="e.g. Grandma&rsquo;s chicken soup" autocomplete="off">
-          <button type="button" class="btn ghost small" id="own-add">Add</button>
         </div>
-        <p class="fine-note">Your own dinners go on the plan, but the grocery list can&rsquo;t guess
-          their ingredients &mdash; there&rsquo;s a blank space on the printed list for them.</p>
+        <div class="own-row">
+          <label class="own-lab" for="own-items">Ingredients <span class="fine">&mdash; optional, separated by commas</span></label>
+          <textarea id="own-items" rows="3" maxlength="600" placeholder="1 whole chicken, 3 carrots, celery, egg noodles, 2 tbsp olive oil"></textarea>
+        </div>
+        <div class="own-row-btn">
+          <button type="button" class="btn ghost small" id="own-add">Add this dinner</button>
+        </div>
+        <p class="fine-note" id="own-read" aria-live="polite">Write quantities if you have them
+          (&ldquo;1 lb mince&rdquo;, &ldquo;2 cans beans&rdquo;) and they are added up with ours, so a
+          shared ingredient is one line with the total. Aisles are guessed from the name; to place a
+          group yourself, start the line with an aisle &mdash; <code>pantry: rice, soy sauce</code>.
+          A dinner with no ingredients still goes on the plan and gets blank lines on the list.</p>
+      </div>
+
+      <div class="own-bank" id="bank" hidden>
+        <h3>Your dinners</h3>
+        <div class="dinner-grid" id="bank-grid"></div>
+        <p class="fine-note" id="bank-note" aria-live="polite"></p>
       </div>
     </div>
 
@@ -188,9 +208,10 @@
     <div class="grid c3">
       <div class="card">
         <h3>1. Pick five dinners</h3>
-        <p>Choose from the twenty family dinners listed below, or type in your own. Five, not seven
-          &mdash; seven-night plans fail in week two, and two open nights are what make the other
-          five survive a sick kid or a late meeting.</p>
+        <p>Choose from the twenty family dinners listed below, or type in your own with their
+          ingredients &mdash; both end up on the same plan and the same list. Five, not seven:
+          seven-night plans fail in week two, and two open nights are what make the other five
+          survive a sick kid or a late meeting.</p>
       </div>
       <div class="card">
         <h3>2. The list writes itself</h3>
@@ -204,6 +225,20 @@
           list and the prep block. Half the mental load of dinner is being the only person who
           knows the answer &mdash; a posted plan ends the question.</p>
       </div>
+    </div>
+
+    <div class="note" style="margin-top:34px">
+      <h3>Your own dinners work too &mdash; that is the point</h3>
+      <p>No stranger&rsquo;s list of twenty dinners is your family&rsquo;s list. So type yours in: a name,
+        and its ingredients separated by commas (&ldquo;1 lb mince, 2 cans tomatoes, 8 oz cheddar&rdquo;).
+        Quantities are read if you write them and <b>added to ours</b>, so an ingredient two dinners share
+        becomes one line with the total instead of two lines you reconcile in the shop. Each ingredient is
+        sorted into the aisle it belongs to; if a guess is wrong, start the line with the aisle you want
+        &mdash; <code>pantry: rice, soy sauce</code> &mdash; and it goes there.</p>
+      <p>Dinners you type in are kept under <b>Your dinners</b> and stay in this browser, so next week is
+        picking from a list rather than typing again. They are never uploaded: there is no account here and
+        no server to upload them to. A dinner with no ingredients is still welcome &mdash; it goes on the
+        plan and the printed list leaves blank lines for it.</p>
     </div>
 
     <div class="sec-head" style="margin-top:46px">

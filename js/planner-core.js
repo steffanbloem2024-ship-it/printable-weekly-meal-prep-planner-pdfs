@@ -242,11 +242,30 @@
   }
 
   // Plural-ish units: "2 cans" from "1 can". Only for the handful we use.
-  var PLURALS = { can: 'cans', ball: 'balls', loaf: 'loaves', packet: 'packets', pack: 'packs', tub: 'tubs', head: 'heads', bunch: 'bunches', bag: 'bags', bottle: 'bottles', tube: 'tubes' };
+  var PLURALS = { can: 'cans', ball: 'balls', loaf: 'loaves', packet: 'packets', pack: 'packs', tub: 'tubs', head: 'heads', bunch: 'bunches', bag: 'bags', bottle: 'bottles', tube: 'tubes', jar: 'jars', box: 'boxes', tin: 'tins', clove: 'cloves', slice: 'slices', cup: 'cups', sprig: 'sprigs', punnet: 'punnets', stick: 'sticks' };
   var SINGULARS = {};
   Object.keys(PLURALS).forEach(function (k) { SINGULARS[PLURALS[k]] = k; });
 
-  function normUnit(u) { return SINGULARS[u] || u; }
+  /* People type units many ways. Fold the spellings onto one so "1 lb" and
+     "2 lbs" add up instead of printing as "1 lb + 2 lbs". */
+  var UNIT_ALIASES = {
+    lbs: 'lb', pound: 'lb', pounds: 'lb',
+    ounce: 'oz', ounces: 'oz', ozs: 'oz',
+    gram: 'g', grams: 'g', grammes: 'g', gr: 'g',
+    kilo: 'kg', kilos: 'kg', kilogram: 'kg', kilograms: 'kg',
+    litre: 'l', litres: 'l', liter: 'l', liters: 'l',
+    millilitre: 'ml', millilitres: 'ml', milliliter: 'ml', milliliters: 'ml',
+    tablespoon: 'tbsp', tablespoons: 'tbsp', tbsps: 'tbsp', tbs: 'tbsp',
+    teaspoon: 'tsp', teaspoons: 'tsp', tsps: 'tsp',
+    quart: 'qt', quarts: 'qt', pint: 'pt', pints: 'pt',
+    pkt: 'packet', pkts: 'packet', pks: 'pack'
+  };
+
+  function normUnit(u) {
+    var k = String(u == null ? '' : u).toLowerCase();
+    if (UNIT_ALIASES[k]) return UNIT_ALIASES[k];
+    return SINGULARS[k] || k;
+  }
 
   function unitFor(unit, num) {
     var base = normUnit(unit);
@@ -330,6 +349,167 @@
     return out;
   }
 
+  /* ------------------------------------------------------------------------
+   * Your own dinners: reading a typed ingredient list.
+   *
+   * A parent's real week is mostly their own dinners, not ours. So the tool has
+   * to accept "Grandma's chicken soup — 1 whole chicken, 3 carrots, celery,
+   * egg noodles" and fold it into the same merged, aisle-sorted list. That is
+   * pure string work, which means it can be tested, so it lives here.
+   * ---------------------------------------------------------------------- */
+
+  var MAX_OWN_ITEMS = 25;
+
+  // Units we recognise when they follow a number. Anything else after the
+  // number is part of the ingredient name ("12 tortillas" -> qty 12).
+  var UNIT_WORDS = {};
+  ['lb', 'oz', 'g', 'kg', 'ml', 'l', 'qt', 'pt', 'cup', 'tbsp', 'tsp', 'dozen', 'sheet', 'sheets']
+    .forEach(function (u) { UNIT_WORDS[u] = 1; });
+  Object.keys(PLURALS).forEach(function (u) { UNIT_WORDS[u] = 1; UNIT_WORDS[PLURALS[u]] = 1; });
+  Object.keys(UNIT_ALIASES).forEach(function (u) { UNIT_WORDS[u] = 1; });
+
+  // "pantry: rice, soy sauce" puts a whole group in the aisle you name, so a
+  // wrong guess is always the user's to overrule.
+  var AISLE_WORDS = {
+    'produce': P, 'veg': P, 'vegetables': P, 'fruit': P, 'fruit & veg': P, 'fruit and veg': P, 'fresh': P,
+    'meat': M, 'fish': M, 'meat & fish': M, 'meat and fish': M, 'seafood': M, 'butcher': M,
+    'dairy': D, 'eggs': D, 'dairy & eggs': D, 'dairy and eggs': D, 'fridge': D, 'chilled': D,
+    'pantry': Y, 'dry': Y, 'dry goods': Y, 'pantry & dry goods': Y, 'cupboard': Y,
+    'store cupboard': Y, 'baking': Y, 'bakery': Y, 'tins': Y, 'cans': Y,
+    'frozen': F, 'freezer': F,
+    'other': O, 'household': O, 'other / household': O, 'misc': O, 'drinks': O, 'cleaning': O
+  };
+
+  // Ingredients already in our own twenty dinners keep their aisle, so a typed
+  // "cheddar" merges with our cheddar instead of starting a second line.
+  var KNOWN = null;
+  function knownSections() {
+    if (KNOWN) return KNOWN;
+    KNOWN = {};
+    DINNERS.forEach(function (d) {
+      d.items.forEach(function (it) { KNOWN[it.name.toLowerCase()] = it.section; });
+    });
+    return KNOWN;
+  }
+
+  // First match wins, so the specific rules come before the broad ones.
+  var SECTION_RULES = [
+    [/\bsalt( and | & )pepper\b|\bsalt\b/, Y],
+    [/\bsoup\b/, Y],
+    [/\bjuice\b/, O],
+    [/\begg (noodles|pasta|rolls?)\b/, Y],
+    [/\b(potato|corn|tortilla) chips\b/, Y],
+    [/\bgarlic bread\b|\bflatbreads?\b/, Y],
+    [/\b(black|white|cayenne|chilli|chili|red)\s+pepper\b|peppercorns?|pepper flakes/, Y],
+    [/\bgarlic (powder|salt)\b|\bonion powder\b|\bdried \w+|\bground (cumin|coriander|cinnamon|ginger|nutmeg|pepper)\b/, Y],
+    [/\btomato (paste|puree|passata|sauce)\b|\b(crushed|canned|tinned|chopped) tomatoes\b/, Y],
+    [/\bcoconut milk\b|\bcurry (paste|powder)\b|\bstock\b|\bbroth\b|\bbouillon\b|\bgravy\b/, Y],
+    [/\bfrozen\b|\bice cream\b|\bfish (sticks|fingers)\b|\boven chips\b|\bfrench fries\b/, F],
+    [/\b(tofu|tempeh|seitan)\b/, P],
+    [/\b(chicken|beef|pork|lamb|turkey|mince|steaks?|bacon|sausages?|ham|chorizo|pepperoni|meatballs?|thighs?|drumsticks?|breasts?|brisket|ribs|hot ?dogs?|salami|prosciutto|deli meat)\b/, M],
+    [/\b(salmon|cod|tuna|haddock|tilapia|prawns?|shrimps?|fish|scallops?|mussels|crab|anchov\w*)\b/, M],
+    [/\b(milk|cheeses?|cheddar|mozzarella|parmesan|feta|halloumi|ricotta|mascarpone|yogh?urt|butter|margarine|creams?|creme|custard|eggs?|paneer)\b/, D],
+    [/\b(onions?|shallots?|garlic|potatoes?|potato|carrots?|celery|lettuce|romaine|spinach|kale|cabbage|broccoli|cauliflower|zucchini|courgettes?|cucumbers?|tomatoes?|tomato|peppers?|capsicum|mushrooms?|avocados?|lemons?|limes?|apples?|bananas?|oranges?|pears?|grapes|berries|strawberr\w*|blueberr\w*|raspberr\w*|melon|pineapple|mango|peach(es)?|plums?|ginger|herbs?|parsley|cilantro|coriander|basil|mint|dill|thyme|rosemary|scallions?|spring onions?|leeks?|green beans?|snap peas|asparagus|squash|aubergines?|eggplants?|beets?|radish\w*|corn on the cob|salad|coleslaw|sprouts|fruit|vegetables?|veg|peas|corn|sweetcorn)\b/, P],
+    [/\b(pasta|spaghetti|penne|macaroni|noodles?|orzo|couscous|quinoa|rice|flour|sugar|oils?|vinegar|salt|spices?|paprika|cumin|oregano|cinnamon|beans?|lentils?|chickpeas|tortillas?|wraps?|bread|buns?|bagels?|pita|cereal|oats|granola|honey|syrup|peanut butter|jam|jelly|soy sauce|ketchup|mayo|mayonnaise|mustard|salsa|olives?|pickles?|crackers?|raisins?|nuts?|almonds?|cashews?|cocoa|baking \w+|yeast|tahini|hummus|seasoning|sauces?|canned \w+|tinned \w+|stuffing|breadcrumbs|gnocchi|polenta|dough|pastry|seeds|sesame|chil(?:i|li) powder|cornflour|cornstarch|stock cubes?)\b/, Y],
+    [/\b(foil|parchment|baking paper|cling film|plastic wrap|zip ?lock|freezer bags?|bin bags?|trash bags?|paper towels?|kitchen roll|napkins?|dish ?soap|detergent|sponges?|wipes?|toilet \w+|batteries|soda|cola|lemonade|water|wine|beer|coffee|tea|dog food|cat food|nappies|diapers)\b/, O]
+  ];
+
+  /* The keyword rules on their own, with no help from our own ingredient
+     list. Exported so the tests can hold the rule table up against 74 real
+     ingredient names instead of only the ones it is told the answer to. */
+  function rulesSection(name) {
+    var n = String(name == null ? '' : name).toLowerCase().trim();
+    if (!n) return O;
+    for (var r = 0; r < SECTION_RULES.length; r++) {
+      if (SECTION_RULES[r][0].test(n)) return SECTION_RULES[r][1];
+    }
+    return O;
+  }
+
+  function guessSection(name) {
+    var n = String(name == null ? '' : name).toLowerCase().trim();
+    if (!n) return O;
+    var known = knownSections();
+    if (known[n]) return known[n];
+    return rulesSection(n);
+  }
+
+  var FRACTIONS = { '½': 0.5, '¼': 0.25, '¾': 0.75, '⅓': 0.33, '⅔': 0.67 };
+
+  function tidyName(s) {
+    var n = s.replace(/^of\s+/i, '').replace(/[\s.,;]+$/, '').replace(/\s+/g, ' ').trim();
+    if (n.length > 44) n = n.slice(0, 44).replace(/\s+\S*$/, '');
+    if (n) n = n.charAt(0).toUpperCase() + n.slice(1);
+    return n;
+  }
+
+  /* One typed chunk -> {name, qty, section}, or null if there is nothing in it.
+     "2 cans crushed tomatoes" -> {name:'Crushed tomatoes', qty:'2 cans', ...} */
+  function parseItem(chunk, forcedSection) {
+    var s = String(chunk == null ? '' : chunk)
+      .replace(/^[\s\-–—*•·]+/, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!s) return null;
+
+    var qty = '';
+    var m = /^(\d+(?:[.,]\d+)?(?:\s*\/\s*\d+)?|[½¼¾⅓⅔])\s*([A-Za-z]{1,12})?\.?\s*(.*)$/.exec(s);
+    if (m && m[3] !== undefined) {
+      var num = null;
+      if (FRACTIONS[m[1]]) num = FRACTIONS[m[1]];
+      else {
+        var raw = m[1].replace(',', '.');
+        if (raw.indexOf('/') !== -1) {
+          var f = raw.split('/');
+          var a = parseFloat(f[0]), b = parseFloat(f[1]);
+          if (b) num = Math.round((a / b) * 100) / 100;
+        } else num = parseFloat(raw);
+      }
+      var unitWord = m[2] ? m[2].toLowerCase() : '';
+      var rest = m[3];
+      // "2 x chicken breasts" / "2 × eggs": the x is a multiplier, not a unit
+      if (unitWord === 'x') { unitWord = ''; }
+      rest = rest.replace(/^[\u00d7x]\s+/i, '');
+      if (num !== null && !isNaN(num)) {
+        if (unitWord && UNIT_WORDS[unitWord] && rest) {
+          var u = normUnit(unitWord);
+          qty = fmtNum(num) + ' ' + unitFor(u, num);
+          s = rest;
+        } else {
+          // no unit, or the "unit" is really the start of the name
+          qty = fmtNum(num);
+          s = ((unitWord ? m[2] + ' ' : '') + rest).trim();
+        }
+      }
+    }
+
+    var name = tidyName(s);
+    if (name.length < 2) return null;
+    return { name: name, qty: qty, section: forcedSection || guessSection(name) };
+  }
+
+  /* A whole typed list. Lines (or semicolons) separate groups, commas separate
+     items, and a line may start with an aisle name to place its items:
+     "produce: 3 carrots, celery, 1 onion". Returns [{name, qty, section}]. */
+  function parseIngredients(text) {
+    var out = [];
+    if (!text) return out;
+    String(text).split(/[\n;]+/).forEach(function (line) {
+      var forced = null;
+      var am = /^\s*([A-Za-z&/ ]{3,24}?)\s*:\s*(.*)$/.exec(line);
+      if (am) {
+        var key = am[1].toLowerCase().replace(/\s+/g, ' ').trim();
+        if (AISLE_WORDS[key]) { forced = AISLE_WORDS[key]; line = am[2]; }
+      }
+      line.split(',').forEach(function (chunk) {
+        if (out.length >= MAX_OWN_ITEMS) return;
+        var it = parseItem(chunk, forced);
+        if (it) out.push(it);
+      });
+    });
+    return out;
+  }
+
   function byId(id) {
     for (var k = 0; k < DINNERS.length; k++) if (DINNERS[k].id === id) return DINNERS[k];
     return null;
@@ -343,6 +523,12 @@
     buildList: buildList,
     buildPrep: buildPrep,
     byId: byId,
+    guessSection: guessSection,
+    rulesSection: rulesSection,
+    parseItem: parseItem,
+    parseIngredients: parseIngredients,
+    AISLE_WORDS: AISLE_WORDS,
+    MAX_OWN_ITEMS: MAX_OWN_ITEMS,
     MAX: 5
   };
 });
