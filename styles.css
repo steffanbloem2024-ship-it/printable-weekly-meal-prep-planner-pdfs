@@ -247,6 +247,8 @@ details p { margin: 12px 0 0; color: var(--ink-soft); font-size: .96rem; max-wid
   display: inline-flex; align-items: center; justify-content: center;
 }
 .step-note { color: var(--ink-soft); font-size: .95rem; max-width: 48em; margin: 0 0 18px; }
+.presets { margin-top: -6px; }
+.presets a { font-weight: 600; }
 .fine-note { font-size: .85rem; color: var(--ink-faint); margin: 10px 0 0; }
 
 .tool-bar { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; margin-bottom: 18px; }

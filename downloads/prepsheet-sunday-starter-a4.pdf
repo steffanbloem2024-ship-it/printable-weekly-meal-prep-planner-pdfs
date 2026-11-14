@@ -13,7 +13,7 @@ endobj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-BoldOblique /Encoding /WinAnsiEncoding >>
 endobj
 5 0 obj
-<< /Type /Pages /Kids [8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 19 0 R] /Count 6 >>
+<< /Type /Pages /Kids [8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 20 0 R] /Count 6 >>
 endobj
 6 0 obj
 << /Length 3214 >>
@@ -3259,7 +3259,7 @@ endobj
 << /Type /Page /Parent 5 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 15 0 R >>
 endobj
 17 0 obj
-<< /Length 7192 >>
+<< /Length 7274 >>
 stream
 BT
 0.42 0.62 0.56 rg
@@ -3606,9 +3606,9 @@ BT
 0.42 0.45 0.46 rg
 /F3 8.6 Tf
 1 0 0 1 46 68.604 Tm
-(And if you never buy a thing: keep the three pages, they are yours. Send them to another parent who is standing in front of an open) Tj
+(Try them first, free: add /planner.html to the address above and the Week Builder turns any five of these dinners into one merged,) Tj
 1 0 0 1 46 57.004 Tm
-(fridge at 5pm.) Tj
+(aisle-sorted grocery list. And if you never buy a thing, keep these three pages — they are yours.) Tj
 ET
 q
 0.86 0.88 0.88 RG
@@ -3635,16 +3635,19 @@ endobj
 << /Type /Annot /Subtype /Link /Rect [60 347.69 432.592 373.69] /Border [0 0 0] /A << /Type /Action /S /URI /URI (https://steffanbloem2024-ship-it.github.io/printable-weekly-meal-prep-planner-pdfs/) >> >>
 endobj
 19 0 obj
-<< /Type /Page /Parent 5 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 17 0 R /Annots [18 0 R] >>
+<< /Type /Annot /Subtype /Link /Rect [46 50.8 549.28 78] /Border [0 0 0] /A << /Type /Action /S /URI /URI (https://steffanbloem2024-ship-it.github.io/printable-weekly-meal-prep-planner-pdfs/planner.html) >> >>
 endobj
 20 0 obj
-<< /Title (The Sunday Starter — free printable meal planner) /Author (PrepSheet) /Subject (Free printable weekly meal planner, grocery list and prep checklist) /Keywords (free printable meal planner, weekly meal plan template, grocery list) /Creator (PrepSheet) /Producer (PrepSheet pdflib) >>
+<< /Type /Page /Parent 5 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 17 0 R /Annots [18 0 R 19 0 R] >>
 endobj
 21 0 obj
+<< /Title (The Sunday Starter — free printable meal planner) /Author (PrepSheet) /Subject (Free printable weekly meal planner, grocery list and prep checklist) /Keywords (free printable meal planner, weekly meal plan template, grocery list) /Creator (PrepSheet) /Producer (PrepSheet pdflib) >>
+endobj
+22 0 obj
 << /Type /Catalog /Pages 5 0 R >>
 endobj
 xref
-0 22
+0 23
 0000000000 65535 f 
 0000000017 00000 n 
 0000000114 00000 n 
@@ -3663,12 +3666,13 @@ xref
 0000044913 00000 n 
 0000053881 00000 n 
 0000054045 00000 n 
-0000061290 00000 n 
-0000061511 00000 n 
-0000061692 00000 n 
-0000062002 00000 n 
+0000061372 00000 n 
+0000061593 00000 n 
+0000061819 00000 n 
+0000062007 00000 n 
+0000062317 00000 n 
 trailer
-<< /Size 22 /Root 21 0 R /Info 20 0 R >>
+<< /Size 23 /Root 22 0 R /Info 21 0 R >>
 startxref
-62052
+62367
 %%EOF

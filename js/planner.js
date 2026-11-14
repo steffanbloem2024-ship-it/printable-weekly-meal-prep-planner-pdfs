@@ -47,6 +47,27 @@
     });
   }
 
+  /* A shared link such as planner.html?week=taco-night,pizza-night opens that
+     exact week. It only reads dinner ids from our own list; anything else in
+     the query is ignored. Returns true if it set the week. */
+  function loadFromQuery() {
+    var q;
+    try { q = (typeof location !== 'undefined' && location.search) || ''; } catch (e) { return false; }
+    var m = /[?&]week=([^&#]*)/.exec(q);
+    if (!m) return false;
+    var picked = [];
+    decodeURIComponent(m[1]).split(',').forEach(function (id) {
+      var d = core.byId(id.trim());
+      if (d && picked.indexOf(d) === -1 && picked.length < MAX) picked.push(d);
+    });
+    if (!picked.length) return false;
+    sel = picked;
+    // Drop the query so a later reload keeps the user's edits instead of
+    // re-applying the preset over them.
+    try { history.replaceState(null, '', location.pathname + (location.hash || '')); } catch (e) {}
+    return true;
+  }
+
   function makeCustom(name) {
     customSeq++;
     return {
@@ -383,7 +404,7 @@
       }
     });
 
-    load();
+    if (!loadFromQuery()) load();
     update();
   }
 
