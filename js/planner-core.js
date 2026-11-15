@@ -152,7 +152,7 @@
       rotation: 3,
       night: 'Sear the chicken pieces, add orzo, stock and spinach, simmer 12 min, finish with cream and parmesan.',
       prep: 'Cut the chicken into bite-size pieces.',
-      items: [i('Bone-in chicken thighs', '1.5 lb', M), i('Orzo', '1 lb', Y), i('Chicken stock', '1 qt', Y), i('Spinach', '1 bag', P), i('Heavy cream', '1 small', D), i('Parmesan', '', D)]
+      items: [i('Boneless chicken thighs', '1.5 lb', M), i('Orzo', '1 lb', Y), i('Chicken stock', '1 qt', Y), i('Spinach', '1 bag', P), i('Heavy cream', '1 small', D), i('Parmesan', '', D)]
     },
     {
       id: 'fish-tacos',
