@@ -16,6 +16,7 @@
   var BANK_KEY = 'prepsheet.bank.v1';
   var DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
   var MAX = core.MAX;
+  var MAX_BANK = 40;     // saved own dinners: a cap so a bad paste cannot fill localStorage
 
   var $ = function (id) { return document.getElementById(id); };
   var sel = [];          // chosen dinner objects, in day order
@@ -23,6 +24,7 @@
   var bank = [];         // "your dinners": typed in by the family, saved locally
   var ownSeq = 0;
   var undoStash = null;
+  var editingId = null;   // the own dinner currently open in the form, if any
 
   /* ----------------------------------------------------------- persistence
    * Two things are stored, both in this browser only:
@@ -43,14 +45,14 @@
     try {
       if (!bank.length) { localStorage.removeItem(BANK_KEY); return; }
       localStorage.setItem(BANK_KEY, JSON.stringify(bank.map(function (d) {
-        return { id: d.id, name: d.name, items: d.items };
+        return { id: d.id, name: d.name, prep: d.prep, items: d.items };
       })));
     } catch (e) {}
   }
 
   /* A dinner the family typed in. `items` may be empty: a name alone still
      earns a place on the plan, it just leaves blank lines on the list. */
-  function makeOwn(name, items, id) {
+  function makeOwn(name, items, id, prep) {
     var clean = [];
     (items || []).slice(0, core.MAX_OWN_ITEMS).forEach(function (it) {
       if (!it || typeof it.name !== 'string' || !it.name.trim()) return;
@@ -69,8 +71,12 @@
       id = 'own-' + ownSeq;
     }
     return {
-      id: id, own: true, name: String(name == null ? '' : name).trim().slice(0, 60),
-      time: '', hands: 'Your own', night: '', prep: '', items: clean
+      id: id, own: true, name: String(name == null ? '' : name).trim().slice(0, core.MAX_NAME_LEN),
+      time: '', hands: 'Your own', night: '',
+      // An own dinner's prep note goes through buildPrep exactly like ours, so
+      // "soak the beans overnight" lands in the printed Sunday prep block.
+      prep: String(prep == null ? '' : prep).replace(/\s+/g, ' ').trim().slice(0, core.MAX_PREP_LEN),
+      items: clean
     };
   }
 
@@ -85,9 +91,9 @@
     if (!raw) return;
     try { data = JSON.parse(raw); } catch (e) { return; }
     if (!Array.isArray(data)) return;
-    data.slice(0, 40).forEach(function (e) {
+    data.slice(0, MAX_BANK).forEach(function (e) {
       if (!e || typeof e.name !== 'string' || !e.name.trim()) return;
-      bank.push(makeOwn(e.name, Array.isArray(e.items) ? e.items : [], e.id));
+      bank.push(makeOwn(e.name, Array.isArray(e.items) ? e.items : [], e.id, e.prep));
     });
   }
 
@@ -414,7 +420,8 @@
     grid.textContent = '';
     box.hidden = bank.length === 0;
     note.textContent = bank.length
-      ? 'Saved in this browser only, ready for next week. Tap one to put it on the plan.'
+      ? 'Saved in this browser only, ready for next week. Tap one to put it on the plan, ' +
+        '✎ to change it, × to delete it.'
       : '';
     bank.forEach(function (d) {
       var card = el('div', 'dcard is-own');
@@ -437,10 +444,16 @@
       pick.appendChild(el('p', 'dprep', d.items.length
         ? d.items.map(function (it) { return it.name; }).join(', ')
         : 'Goes on the plan; the grocery list leaves blank lines for it.'));
+      if (d.prep) pick.appendChild(el('p', 'dprep own-prepnote', 'Prep ahead: ' + d.prep));
       pick.addEventListener('click', function () { toggle(d); });
       card.appendChild(pick);
-      card.appendChild(btn('×', 'Delete ' + d.name + ' from your dinners',
-                           function () { removeFromBank(d); }, false, 'rm'));
+
+      if (editingId === d.id) card.classList.add('is-editing');
+      var ctl = el('div', 'own-ctl');
+      ctl.appendChild(btn('✎', 'Edit ' + d.name, function () { startEdit(d); }, false, 'ed'));
+      ctl.appendChild(btn('×', 'Delete ' + d.name + ' from your dinners',
+                          function () { removeFromBank(d); }, false, 'rm'));
+      card.appendChild(ctl);
       grid.appendChild(card);
     });
   }
@@ -449,6 +462,7 @@
   function removeFromBank(d) {
     var at = bank.indexOf(d);
     if (at === -1) return;
+    if (editingId === d.id) { endEdit(); clearForm(); }
     var selAt = sel.indexOf(d);
     bank.splice(at, 1);
     if (selAt !== -1) sel.splice(selAt, 1);
@@ -477,11 +491,13 @@
   /* Say out loud how the typed ingredients were read, including which aisle
      each went to. A silent guess the user cannot see is a guess they cannot
      correct. */
-  function describeOwn(d, added) {
-    var where = added ? 'added to this week' : 'saved to your dinners — this week is already full';
+  function describeOwn(d, where) {
+    var tail = d.prep
+      ? ' Prep-ahead step saved: “' + d.prep + '” — it joins the prep block on the printed sheet.'
+      : '';
     if (!d.items.length) {
       return '“' + d.name + '” ' + where + '. No ingredients read, so the printed list ' +
-             'leaves blank lines for it.';
+             'leaves blank lines for it.' + tail;
     }
     var byAisle = {};
     d.items.forEach(function (it) {
@@ -496,7 +512,174 @@
         'front of a group to place it yourself.'
       : '';
     return '“' + d.name + '” ' + where + '. Read ' + d.items.length +
-           (d.items.length === 1 ? ' ingredient: ' : ' ingredients: ') + parts.join(' · ') + '.' + hint;
+           (d.items.length === 1 ? ' ingredient: ' : ' ingredients: ') + parts.join(' · ') +
+           '.' + hint + tail;
+  }
+
+
+  /* ----------------------------------------------- the own-dinner form
+   * One form does both jobs: adding a dinner and editing one already saved.
+   * In edit mode the dinner's fields are written back into the inputs as text
+   * the parser reads the same way (core.itemsToText), including the aisle in
+   * front of each group — so an edit cannot quietly lose an aisle the family
+   * corrected by hand.
+   */
+
+  function formNote(text) { $('own-read').textContent = text; }
+
+  function clearForm() {
+    $('own-input').value = '';
+    $('own-items').value = '';
+    $('own-prep').value = '';
+  }
+
+  function endEdit() {
+    editingId = null;
+    $('own-add').textContent = 'Add this dinner';
+    $('own-cancel').hidden = true;
+  }
+
+  function startEdit(d) {
+    editingId = d.id;
+    $('own-input').value = d.name;
+    $('own-items').value = core.itemsToText(d.items);
+    $('own-prep').value = d.prep || '';
+    $('own-add').textContent = 'Save changes';
+    $('own-cancel').hidden = false;
+    renderBank();
+    formNote('Editing “' + d.name + '”. The word before each group is the aisle it goes to — ' +
+             'change it to move those items. Saving keeps this dinner in your week if it is in it.');
+    var input = $('own-input');
+    if (typeof input.scrollIntoView === 'function') {
+      try { input.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+    }
+    if (typeof input.focus === 'function') { try { input.focus(); } catch (e) {} }
+  }
+
+  function cancelEdit() {
+    endEdit();
+    clearForm();
+    renderBank();
+    formNote('Edit cancelled — nothing changed.');
+  }
+
+  function submitOwn() {
+    var name = ($('own-input').value || '').trim();
+    var itemsText = $('own-items').value || '';
+    var prep = ($('own-prep').value || '').trim();
+    if (!name) {
+      formNote('Give the dinner a name first — then its ingredients underneath, ' +
+        'if you want them on the grocery list.');
+      return;
+    }
+    var items = core.parseIngredients(itemsText);
+
+    if (editingId) {
+      var old = bankById(editingId);
+      if (old) {
+        // Rewrite the SAME object, so a week that already contains this dinner
+        // keeps it (and its printed list updates) instead of losing the night.
+        var fresh = makeOwn(name, items, old.id, prep);
+        old.name = fresh.name;
+        old.prep = fresh.prep;
+        old.items = fresh.items;
+        endEdit();
+        clearForm();
+        saveBank();
+        update();
+        formNote(describeOwn(old, sel.indexOf(old) !== -1
+          ? 'updated — it is on this week'
+          : 'updated and kept in your dinners'));
+        return;
+      }
+      endEdit();   // it was deleted mid-edit: fall through and add it as new
+    }
+
+    var d = makeOwn(name, items, null, prep);
+    bank.push(d);
+    saveBank();
+    var added = sel.length < MAX;
+    if (added) sel.push(d);
+    clearForm();
+    update();
+    formNote(describeOwn(d, added
+      ? 'added to this week'
+      : 'saved to your dinners — this week is already full'));
+  }
+
+  /* --------------------------------------- the dinner bank, as plain text
+   * The bank lives in one browser. That is the privacy promise and also a
+   * trap: a new laptop, or clearing site data, loses typed work. So the whole
+   * bank can be copied out as text and pasted back in anywhere — no account,
+   * no upload, no file. The format is the one the page already teaches.
+   */
+
+  function bankExportText() {
+    var where = '';
+    try { where = location.origin + location.pathname; } catch (e) { where = ''; }
+    var head = 'PrepSheet — my dinners (' + bank.length + ')';
+    var how = 'Paste this whole block into the “paste a list in” box' +
+      (where ? ' at ' + where : ' in the PrepSheet Week Builder') +
+      ' in any browser to get these dinners back.';
+    return head + '\n' + how + '\n\n' + core.bankToText(bank);
+  }
+
+  function importBankText() {
+    var ta = $('bank-paste');
+    var parsed = core.textToDinners(ta.value || '');
+    if (!parsed.length) {
+      bankNote('Nothing read. Each dinner needs a line that starts with # and its name, ' +
+        'like “# Grandma’s chicken soup”, with its ingredients on the lines underneath.');
+      return;
+    }
+    var added = 0, dupes = [], full = 0;
+    parsed.forEach(function (pd) {
+      if (bank.length >= MAX_BANK) { full++; return; }
+      var clash = false;
+      bank.forEach(function (b) {
+        if (b.name.toLowerCase() === pd.name.toLowerCase()) clash = true;
+      });
+      if (clash) { dupes.push(pd.name); return; }
+      bank.push(makeOwn(pd.name, pd.items, null, pd.prep));
+      added++;
+    });
+    saveBank();
+    ta.value = '';
+    update();
+    var msg = added
+      ? 'Added ' + added + (added === 1 ? ' dinner' : ' dinners') + ' to your dinners.'
+      : 'Nothing added.';
+    if (dupes.length) {
+      msg += ' Skipped ' + dupes.length + ' already here: ' + dupes.slice(0, 4).join(', ') +
+        (dupes.length > 4 ? '…' : '') + '.';
+    }
+    if (full) msg += ' ' + full + ' left out — ' + MAX_BANK + ' saved dinners is the limit.';
+    bankNote(msg);
+  }
+
+  function bankNote(text) { $('bank-io-note').textContent = text; }
+
+  function showPaste(on) {
+    $('bank-paste-wrap').hidden = !on;
+    $('bank-paste-toggle').textContent = on ? 'hide the paste box' : 'or paste a list in';
+  }
+
+  /* One clipboard path for both copy buttons: the async API where it exists,
+     a hidden textarea where it does not. */
+  function copyText(text, done, failed) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, failed);
+      return;
+    }
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy') ? done() : failed(); } catch (e) { failed(); }
+    document.body.removeChild(ta);
   }
 
   /* --------------------------------------------------------------- plumbing */
@@ -533,29 +716,36 @@
       });
     });
 
-    $('own-add').addEventListener('click', addOwn);
+    $('own-add').addEventListener('click', submitOwn);
+    $('own-cancel').addEventListener('click', cancelEdit);
     $('own-input').addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') { e.preventDefault(); addOwn(); }
+      if (e.key === 'Enter') { e.preventDefault(); submitOwn(); }
+    });
+    $('own-prep').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); submitOwn(); }
     });
 
-    function addOwn() {
-      var nameEl = $('own-input'), itemsEl = $('own-items'), note = $('own-read');
-      var name = (nameEl.value || '').trim();
-      if (!name) {
-        note.textContent = 'Give the dinner a name first — then its ingredients underneath, ' +
-          'if you want them on the grocery list.';
-        return;
-      }
-      var d = makeOwn(name, core.parseIngredients(itemsEl.value || ''));
-      bank.push(d);
-      saveBank();
-      var added = sel.length < MAX;
-      if (added) sel.push(d);
-      nameEl.value = '';
-      itemsEl.value = '';
-      update();
-      note.textContent = describeOwn(d, added);
-    }
+    $('bank-copy').addEventListener('click', function () {
+      copyText(bankExportText(),
+        function () {
+          bankNote('All ' + bank.length + (bank.length === 1 ? ' dinner' : ' dinners') +
+            ' copied as text. Paste it somewhere you keep notes — that copy works in any browser.');
+        },
+        function () {
+          bankNote('Could not reach the clipboard, so the box above now holds the same text — ' +
+            'select it and copy it by hand.');
+          showPaste(true);
+          $('bank-paste').value = bankExportText();
+        });
+    });
+
+    $('bank-paste-toggle').addEventListener('click', function () {
+      showPaste($('bank-paste-wrap').hidden);
+    });
+    $('bank-paste-add').addEventListener('click', importBankText);
+    // The paste box starts closed from the script, not from the HTML attribute,
+    // so the page and the tests agree on the state it opens in.
+    showPaste(false);
 
     $('print').addEventListener('click', function () { window.print(); });
 
@@ -563,28 +753,17 @@
       // Start over clears the week, never the dinners the family typed in.
       sel = [];
       try { localStorage.removeItem(KEY); } catch (e) {}
+      endEdit();
+      clearForm();
       update();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
     $('copy').addEventListener('click', function () {
-      var text = groceryText();
       var note = $('copy-note');
-      var done = function () { note.textContent = 'Grocery list copied — paste it into your notes app.'; };
-      var failed = function () { note.textContent = 'Could not copy automatically — use the print button instead.'; };
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(done, failed);
-      } else {
-        var ta = document.createElement('textarea');
-        ta.value = text;
-        ta.setAttribute('readonly', '');
-        ta.style.position = 'fixed';
-        ta.style.left = '-9999px';
-        document.body.appendChild(ta);
-        ta.select();
-        try { document.execCommand('copy') ? done() : failed(); } catch (e) { failed(); }
-        document.body.removeChild(ta);
-      }
+      copyText(groceryText(),
+        function () { note.textContent = 'Grocery list copied — paste it into your notes app.'; },
+        function () { note.textContent = 'Could not copy automatically — use the print button instead.'; });
     });
 
     loadBank();

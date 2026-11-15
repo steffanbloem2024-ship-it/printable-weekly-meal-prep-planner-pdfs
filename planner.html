@@ -102,6 +102,8 @@
         <a href="planner.html?week=sheetpan-chicken,sausage-sheetpan,fish-tacos,roast-thighs-cabbage,lentil-pie">a sheet-pan week</a>
         &middot;
         <a href="planner.html?week=taco-night,chicken-orzo,fried-rice-big,pasta-fagioli,chili-mac">a one-pot week</a>
+        &middot;
+        <a href="planner.html?week=hidden-veg-pasta,quesadillas,chili-mac,bean-burritos,lentil-pie">a batch-cook week for the freezer</a>
         &mdash; then swap anything you like. Each one is also
         <a href="weeks/index.html">written out as a finished page you can just print</a>.</p>
 
@@ -120,20 +122,49 @@
           <label class="own-lab" for="own-items">Ingredients <span class="fine">&mdash; optional, separated by commas</span></label>
           <textarea id="own-items" rows="3" maxlength="600" placeholder="1 whole chicken, 3 carrots, celery, egg noodles, 2 tbsp olive oil"></textarea>
         </div>
+        <div class="own-row">
+          <label class="own-lab" for="own-prep">Prep-ahead step <span class="fine">&mdash; optional, one line</span></label>
+          <input id="own-prep" type="text" maxlength="120" placeholder="e.g. soak the beans the night before" autocomplete="off">
+        </div>
         <div class="own-row-btn">
           <button type="button" class="btn ghost small" id="own-add">Add this dinner</button>
+          <button type="button" class="btn ghost small" id="own-cancel" hidden>Cancel</button>
         </div>
         <p class="fine-note" id="own-read" aria-live="polite">Write quantities if you have them
           (&ldquo;1 lb mince&rdquo;, &ldquo;2 cans beans&rdquo;) and they are added up with ours, so a
           shared ingredient is one line with the total. Aisles are guessed from the name; to place a
           group yourself, start the line with an aisle &mdash; <code>pantry: rice, soy sauce</code>.
-          A dinner with no ingredients still goes on the plan and gets blank lines on the list.</p>
+          A dinner with no ingredients still goes on the plan and gets blank lines on the list.
+          A prep-ahead step, if you write one, joins the Sunday prep block on the printed sheet.</p>
       </div>
 
       <div class="own-bank" id="bank" hidden>
         <h3>Your dinners</h3>
         <div class="dinner-grid" id="bank-grid"></div>
         <p class="fine-note" id="bank-note" aria-live="polite"></p>
+
+        <div class="bank-io">
+          <div class="bank-io-bar">
+            <button type="button" class="btn ghost small" id="bank-copy">Copy my dinners as text</button>
+            <button type="button" class="linkish" id="bank-paste-toggle">or paste a list in</button>
+          </div>
+          <div id="bank-paste-wrap" hidden>
+            <div class="own-row">
+              <label class="own-lab" for="bank-paste">Paste dinners you copied out of another browser</label>
+              <textarea id="bank-paste" rows="6" maxlength="6000" placeholder="# Grandma&rsquo;s chicken soup
+prep: soak the beans the night before
+meat: 1 whole chicken
+produce: 3 carrots, celery"></textarea>
+            </div>
+            <div class="own-row-btn">
+              <button type="button" class="btn ghost small" id="bank-paste-add">Add these dinners</button>
+            </div>
+          </div>
+          <p class="fine-note" id="bank-io-note" aria-live="polite">Your dinners live in this browser
+            and nowhere else, which is the promise &mdash; and also the catch, because a new phone or a
+            cleared cache loses them. So copy them out as plain text whenever you like, keep that text
+            wherever you keep notes, and paste it back in on any browser. Nothing is uploaded either way.</p>
+        </div>
       </div>
     </div>
 
@@ -241,6 +272,15 @@
         picking from a list rather than typing again. They are never uploaded: there is no account here and
         no server to upload them to. A dinner with no ingredients is still welcome &mdash; it goes on the
         plan and the printed list leaves blank lines for it.</p>
+      <p>You can <b>change a saved dinner</b> at any time &mdash; the &#9998; button puts it back in the form
+        with its ingredients written out aisle by aisle, so fixing a typo or adding the thing you forgot
+        takes a second and keeps the dinner in the week it is already in. You can also give a dinner a
+        <b>prep-ahead step</b> (&ldquo;soak the beans the night before&rdquo;), and it joins the Sunday prep
+        block on the printed sheet alongside ours.</p>
+      <p>And because they live in one browser, you can <b>copy all your dinners out as plain text</b> and
+        paste them back in anywhere &mdash; a new laptop, a partner&rsquo;s phone, or just a note you keep
+        in case you clear your cache. Still no account, still nothing uploaded; the text is yours and it
+        never leaves your device unless you send it somewhere yourself.</p>
     </div>
 
     <div class="sec-head" style="margin-top:46px">

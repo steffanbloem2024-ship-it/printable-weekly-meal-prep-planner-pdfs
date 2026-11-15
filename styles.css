@@ -1,5 +1,11 @@
 /* PrepSheet — static stylesheet. No build step, no external fonts. */
 
+/* A class that sets display (.btn is inline-flex) beats the browser’s own rule
+   for the hidden attribute, which is how a "Cancel" button stayed on screen when
+   nothing was being edited. Everything the planner shows and hides uses .hidden,
+   so make the attribute win everywhere. */
+[hidden] { display: none !important; }
+
 :root {
   --ink: #16211f;
   --ink-soft: #46524f;
@@ -132,19 +138,23 @@ section.tight { padding: 40px 0; }
 .card p { margin: 0; color: var(--ink-soft); font-size: .96rem; }
 .card .tag { font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--green-soft); display: block; margin-bottom: 10px; }
 
-/* steps */
+/* Steps — the label-beside-text rows on the home and free pages.
+   SCOPED TO .steps ON PURPOSE: the Week Builder also calls its sections
+   .step, and when these rules were unscoped they turned that whole page into
+   a 112px/1fr two-column grid — the twenty dinner cards ended up stacked in
+   one narrow column with the "add your own" box beside them. */
 .steps { counter-reset: step; display: grid; gap: 4px; }
-.step { display: grid; grid-template-columns: 112px 1fr; gap: 24px; padding: 20px 0; border-top: 1px solid var(--line-soft); }
-.step:first-child { border-top: 0; }
-.step .chip {
+.steps .step { display: grid; grid-template-columns: 112px 1fr; gap: 24px; padding: 20px 0; border-top: 1px solid var(--line-soft); }
+.steps .step:first-child { border-top: 0; }
+.steps .step .chip {
   align-self: start; background: var(--pale); color: var(--green-dark);
   font-size: .8rem; font-weight: 700; padding: 5px 0; border-radius: 999px; text-align: center;
 }
 .step h3 { margin-bottom: .25em; }
-.step p { margin: 0; color: var(--ink-soft); font-size: .97rem; }
+.steps .step p { margin: 0; color: var(--ink-soft); font-size: .97rem; }
 @media (max-width: 620px) {
-  .step { grid-template-columns: 1fr; gap: 8px; }
-  .step .chip { justify-self: start; padding: 4px 14px; }
+  .steps .step { grid-template-columns: 1fr; gap: 8px; }
+  .steps .step .chip { justify-self: start; padding: 4px 14px; }
 }
 
 /* contents list */
@@ -321,6 +331,21 @@ details p { margin: 12px 0 0; color: var(--ink-soft); font-size: .96rem; max-wid
   background: none; border: 0; padding: 2px 0; width: 100%;
 }
 .dcard.is-own .dmeta .time { background: #f6efdf; color: #7a6a44; }
+.dcard.is-own.is-editing { border-color: var(--green); box-shadow: 0 0 0 3px var(--pale); }
+.own-ctl { display: flex; flex-direction: column; gap: 6px; }
+.own-prepnote { color: var(--green-dark); }
+.mini.ed:hover { border-color: var(--green-soft); color: var(--green-dark); }
+
+/* Copying the dinner bank out as text, and pasting it back in */
+.bank-io { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line); }
+.bank-io-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.bank-io textarea {
+  font: inherit; width: 100%; padding: 11px 14px; line-height: 1.5; resize: vertical;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--cream); color: var(--ink);
+}
+.bank-io textarea:focus { outline: 2px solid var(--green-soft); outline-offset: 1px; }
+.bank-io .own-row { margin-top: 14px; }
+
 .linkish {
   font: inherit; background: none; border: 0; padding: 0;
   color: var(--green-dark); text-decoration: underline; cursor: pointer;

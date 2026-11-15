@@ -510,6 +510,94 @@
     return out;
   }
 
+  /* ------------------------------------------------------------------------
+   * Writing own dinners back OUT as text.
+   *
+   * Two features need this and neither works without it. Editing: a saved
+   * dinner has to return to the textarea as text the parser reads the same
+   * way, or correcting a typo would quietly lose the aisles the family fixed
+   * by hand. Export: a dinner bank that lives in one browser is a dinner bank
+   * you lose when you change laptop, so the whole bank can be copied out as
+   * plain text and pasted back in anywhere.
+   *
+   * The format is the one planner.html already documents, which is exactly
+   * why it round-trips:
+   *
+   *     # Grandma's chicken soup
+   *     prep: Soak the beans overnight
+   *     meat: 1 whole chicken
+   *     produce: 3 carrots, celery
+   *
+   * Every group carries its aisle, so reading it back never has to guess.
+   * ---------------------------------------------------------------------- */
+
+  var SECTION_PREFIX = {};
+  SECTION_PREFIX[P] = 'produce';
+  SECTION_PREFIX[M] = 'meat';
+  SECTION_PREFIX[D] = 'dairy';
+  SECTION_PREFIX[Y] = 'pantry';
+  SECTION_PREFIX[F] = 'frozen';
+  SECTION_PREFIX[O] = 'other';
+
+  var MAX_PREP_LEN = 120;
+  var MAX_NAME_LEN = 60;
+
+  function itemText(it) { return (it.qty ? it.qty + ' ' : '') + it.name; }
+
+  /* [{name,qty,section}] -> "meat: 1 whole chicken\nproduce: 3 carrots, celery".
+     One line per aisle, in aisle order, always prefixed. */
+  function itemsToText(items) {
+    var lines = [];
+    SECTIONS.forEach(function (s) {
+      var group = [];
+      (items || []).forEach(function (it) {
+        if (it && it.section === s && it.name) group.push(itemText(it));
+      });
+      if (group.length) lines.push(SECTION_PREFIX[s] + ': ' + group.join(', '));
+    });
+    return lines.join('\n');
+  }
+
+  function dinnerToText(d) {
+    var out = ['# ' + String((d && d.name) || '').replace(/\s+/g, ' ').trim()];
+    if (d && d.prep) out.push('prep: ' + String(d.prep).replace(/\s+/g, ' ').trim());
+    var items = itemsToText(d && d.items);
+    if (items) out.push(items);
+    return out.join('\n');
+  }
+
+  function bankToText(list) {
+    var blocks = [];
+    (list || []).forEach(function (d) {
+      if (d && d.name) blocks.push(dinnerToText(d));
+    });
+    return blocks.join('\n\n');
+  }
+
+  /* The inverse: pasted text -> [{name, prep, items}]. A dinner starts at a
+     line beginning with "#", so anything above the first one (a header line
+     from the copy button, a note to self) is ignored rather than fatal. */
+  function textToDinners(text) {
+    var blocks = [];
+    var cur = null;
+    String(text == null ? '' : text).split(/\r?\n/).forEach(function (line) {
+      var h = /^\s*#+\s*(.+)$/.exec(line);
+      if (h) {
+        var nm = h[1].replace(/\s+/g, ' ').trim().slice(0, MAX_NAME_LEN);
+        cur = nm ? { name: nm, prep: '', lines: [] } : null;
+        if (cur) blocks.push(cur);
+        return;
+      }
+      if (!cur) return;
+      var p = /^\s*prep\s*:\s*(.+)$/i.exec(line);
+      if (p) { cur.prep = p[1].replace(/\s+/g, ' ').trim().slice(0, MAX_PREP_LEN); return; }
+      if (line.trim()) cur.lines.push(line);
+    });
+    return blocks.map(function (b) {
+      return { name: b.name, prep: b.prep, items: parseIngredients(b.lines.join('\n')) };
+    });
+  }
+
   function byId(id) {
     for (var k = 0; k < DINNERS.length; k++) if (DINNERS[k].id === id) return DINNERS[k];
     return null;
@@ -527,6 +615,13 @@
     rulesSection: rulesSection,
     parseItem: parseItem,
     parseIngredients: parseIngredients,
+    itemsToText: itemsToText,
+    dinnerToText: dinnerToText,
+    bankToText: bankToText,
+    textToDinners: textToDinners,
+    SECTION_PREFIX: SECTION_PREFIX,
+    MAX_PREP_LEN: MAX_PREP_LEN,
+    MAX_NAME_LEN: MAX_NAME_LEN,
     AISLE_WORDS: AISLE_WORDS,
     MAX_OWN_ITEMS: MAX_OWN_ITEMS,
     MAX: 5
