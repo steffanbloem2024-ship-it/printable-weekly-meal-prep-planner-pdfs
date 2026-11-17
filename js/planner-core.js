@@ -23,6 +23,15 @@
 
   function i(name, qty, section) { return { name: name, qty: qty || '', section: section }; }
 
+  /*
+   * c() marks a prep step that COOKS food. Cooked rice, chicken, potatoes and
+   * sauces are good for three to four days in the fridge, so such a step
+   * cannot just be done on a weekend prep day for a Thursday or Friday dinner.
+   * buildPrep works out the age from the night the dinner lands on and prints
+   * the fix (do it midweek, or freeze it on prep day) next to the step.
+   */
+  function c(text) { return { text: text, cooked: true }; }
+
   var DINNERS = [
     {
       id: 'sheetpan-chicken',
@@ -51,7 +60,7 @@
       hands: 'Easy',
       rotation: 1,
       night: 'Boil the pasta. Warm the blended sauce. Butter and broil the bread.',
-      prep: 'Make the sauce: soften onion, carrot and zucchini, add crushed tomatoes, simmer 20 min, blend smooth. Keeps 5 days.',
+      prep: c('Make the sauce: soften onion, carrot and zucchini, add crushed tomatoes, simmer 20 min, blend smooth.'),
       items: [i('Pasta', '1 lb', Y), i('Crushed tomatoes', '2 cans', Y), i('Onions', '1', P), i('Carrots', '2', P), i('Zucchini', '1', P), i('Garlic', '1 head', P), i('Crusty bread', '1 loaf', Y), i('Butter', '', D), i('Parmesan', '', D)]
     },
     {
@@ -61,7 +70,7 @@
       hands: 'Easy',
       rotation: 1,
       night: 'Brown the beef. Build bowls with rice, black beans, corn, cheese and whatever toppings are around.',
-      prep: 'Cook the big pot of rice.',
+      prep: c('Cook the rice.'),
       items: [i('Ground beef', '1 lb', M), i('Long-grain rice', '1 lb', Y), i('Black beans', '1 can', Y), i('Corn', '1 bag', F), i('Cheddar', '4 oz', D)]
     },
     {
@@ -81,7 +90,7 @@
       hands: 'Mostly oven',
       rotation: 2,
       night: 'Brush the salmon with the sauce, bake 400°F / 205°C for 12 min. Reheat rice. Dress cucumbers with rice vinegar and a pinch of sugar.',
-      prep: 'Mix the honey-soy sauce in a jar (soy, honey, grated garlic, a little sesame oil). Slice the cucumbers.',
+      prep: ['Mix the honey-soy sauce in a jar (soy, honey, grated garlic, a little sesame oil). Slice the cucumbers.', c('Cook the rice.')],
       items: [i('Salmon fillets', '4', M), i('Long-grain rice', '1 lb', Y), i('Cucumbers', '3', P), i('Garlic', '1 head', P), i('Soy sauce', '', Y), i('Honey', '', Y), i('Sesame oil', '', Y), i('Rice vinegar', '', Y)]
     },
     {
@@ -91,7 +100,7 @@
       hands: 'Easy',
       rotation: 2,
       night: 'Fill the tortillas with shredded chicken and cheese, crisp in a dry pan. Heat the soup.',
-      prep: 'Roast and shred the chicken breast (oil, salt, 400°F / 205°C, 25 min).',
+      prep: c('Roast and shred the chicken breast (oil, salt, 400°F / 205°C, 25 min).'),
       items: [i('Chicken breast', '1.5 lb', M), i('Large tortillas', '8', Y), i('Shredded cheese', '8 oz', D), i('Tomato soup', '2 cans', Y)]
     },
     {
@@ -121,7 +130,7 @@
       hands: 'Easy',
       rotation: 2,
       night: 'Warm shredded chicken in teriyaki sauce. Serve over rice with steamed broccoli and sesame seeds.',
-      prep: 'Roast and shred the chicken breast; cook the rice.',
+      prep: [c('Roast and shred the chicken breast (oil, salt, 400°F / 205°C, 25 min).'), c('Cook the rice.')],
       items: [i('Chicken breast', '1.5 lb', M), i('Long-grain rice', '1 lb', Y), i('Teriyaki sauce', '1 bottle', Y), i('Broccoli', '1 head', P), i('Sesame seeds', '', Y)]
     },
     {
@@ -171,7 +180,7 @@
       hands: 'Clean-out night',
       rotation: 3,
       night: 'Day-old rice, frozen mixed veg, scrambled egg, soy sauce, and anything left in the fridge.',
-      prep: 'Cook the rice early in the week so it dries out — fresh rice goes gluey.',
+      prep: c('Cook the rice ahead so it dries out — fresh rice goes gluey.'),
       items: [i('Long-grain rice', '1 lb', Y), i('Mixed vegetables', '1 bag', F), i('Eggs', '4', D), i('Soy sauce', '', Y)]
     },
     {
@@ -181,7 +190,7 @@
       hands: 'Makes extra to freeze',
       rotation: 4,
       night: 'Mash refried beans with cumin, roll with rice and cheese, bake seam-down 400°F / 205°C for 15 min. Freeze the spares.',
-      prep: 'Cook the rice.',
+      prep: c('Cook the rice.'),
       items: [i('Refried beans', '2 cans', Y), i('Large tortillas', '10', Y), i('Long-grain rice', '1 lb', Y), i('Shredded cheese', '8 oz', D), i('Cumin', '', Y), i('Foil', '', O)]
     },
     {
@@ -191,7 +200,7 @@
       hands: 'Mostly oven',
       rotation: 4,
       night: 'Simmer lentils with carrot, onion and tomato paste, top with mashed potato, bake 25 min until the top browns.',
-      prep: 'Boil and mash the potatoes — this is the slow part, so do it on prep day.',
+      prep: c('Boil and mash the potatoes — this is the slow part, so get it done ahead.'),
       items: [i('Brown lentils', '1 lb', Y), i('Potatoes', '3 lb', P), i('Carrots', '3', P), i('Onions', '1', P), i('Tomato paste', '1 tube', Y), i('Butter', '', D), i('Milk', '', D)]
     },
     {
@@ -201,7 +210,7 @@
       hands: 'Easy',
       rotation: 4,
       night: 'Leftover rice, frozen peas and carrots, three scrambled eggs, soy sauce, a little sesame oil.',
-      prep: 'None — this one runs on rice you already cooked.',
+      prep: c('Cook the rice.'),
       items: [i('Long-grain rice', '1 lb', Y), i('Eggs', '6', D), i('Peas and carrots', '1 bag', F), i('Soy sauce', '', Y), i('Sesame oil', '', Y)]
     },
     {
@@ -330,23 +339,86 @@
     return parts.join(' + ');
   }
 
-  /*
-   * The Sunday prep block: the deduplicated prep notes for the chosen dinners,
-   * minus the "nothing to do" ones.
+  /* ---------------------------------------------------------- the prep block
+   * A dinner's `prep` is a string, a c() cooked step, or an array of either.
+   * prepSteps normalises all three; prepText is the one-line version used on
+   * the dinner cards.
    */
-  function buildPrep(dinners) {
-    var seen = {};
+  function prepSteps(d) {
+    if (!d || !d.prep) return [];
+    var raw = Array.isArray(d.prep) ? d.prep : [d.prep];
     var out = [];
-    dinners.forEach(function (d) {
-      var t = d.prep;
-      if (!t) return;
-      if (/^(nothing|none)\b/i.test(t)) return;
-      var k = t.toLowerCase();
-      if (seen[k]) return;
-      seen[k] = 1;
-      out.push({ text: t, dinner: d.name });
+    raw.forEach(function (st) {
+      var text = typeof st === 'string' ? st : (st && st.text) || '';
+      text = String(text).replace(/\s+/g, ' ').trim();
+      if (!text) return;
+      out.push({ text: text, cooked: !!(st && st.cooked) });
     });
     return out;
+  }
+
+  function prepText(d) {
+    return prepSteps(d).map(function (st) { return st.text; }).join(' ');
+  }
+
+  var PREP_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  var AGE_WORD = ['one', 'two', 'three', 'four', 'five'];
+
+  function listDays(idxs) {
+    var names = idxs.map(function (n) { return PREP_DAYS[n]; });
+    if (names.length < 2) return names.join('');
+    return names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
+  }
+
+  /*
+   * Given the nights a cooked prep step has to feed, say how to keep it safe.
+   * Prep day is the weekend before, so Monday is one day old and Friday five;
+   * cooked food is good for three to four. Monday to Wednesday needs no note.
+   */
+  function cookedNote(days) {
+    var early = days.filter(function (n) { return n < 3; });
+    var late = days.filter(function (n) { return n >= 3; });
+    if (!late.length) return '';
+    if (early.length) {
+      return 'Cooked food keeps three to four days: keep what ' + listDays(early) +
+             (early.length > 1 ? ' need' : ' needs') + ' in the fridge, and for ' + listDays(late) +
+             ' either cook a fresh batch midweek or freeze that portion on prep day and thaw it in the fridge the night before.';
+    }
+    var last = late[late.length - 1];
+    return PREP_DAYS[last] + ' is ' + AGE_WORD[last] + ' days after a weekend prep day, and cooked food keeps ' +
+           'three to four. Either do this step on ' + PREP_DAYS[last - 2] +
+           ' instead, or freeze it on prep day and thaw it in the fridge the night before.';
+  }
+
+  /*
+   * The prep block: every prep step of the chosen dinners, deduplicated by its
+   * own text (so one chicken roast serves two dinners), minus the "nothing to
+   * do" ones, each with the nights it feeds and a food-safety note when a
+   * cooked step has to last until Thursday or Friday.
+   */
+  function buildPrep(dinners) {
+    var byText = {};
+    var order = [];
+    dinners.forEach(function (d, idx) {
+      prepSteps(d).forEach(function (st) {
+        if (/^(nothing|none)\b/i.test(st.text)) return;
+        var k = st.text.toLowerCase();
+        if (!byText[k]) {
+          byText[k] = { text: st.text, cooked: false, dinner: d.name, dinners: [], days: [], note: '' };
+          order.push(k);
+        }
+        var e = byText[k];
+        e.cooked = e.cooked || st.cooked;
+        if (e.dinners.indexOf(d.name) < 0) e.dinners.push(d.name);
+        if (e.days.indexOf(idx) < 0) e.days.push(idx);
+      });
+    });
+    return order.map(function (k) {
+      var e = byText[k];
+      e.days.sort(function (a, b) { return a - b; });
+      e.note = e.cooked ? cookedNote(e.days) : '';
+      return e;
+    });
   }
 
   /* ------------------------------------------------------------------------
@@ -610,6 +682,9 @@
     sumQtys: sumQtys,
     buildList: buildList,
     buildPrep: buildPrep,
+    prepSteps: prepSteps,
+    prepText: prepText,
+    cookedNote: cookedNote,
     byId: byId,
     guessSection: guessSection,
     rulesSection: rulesSection,

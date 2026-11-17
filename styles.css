@@ -409,6 +409,9 @@ details p { margin: 12px 0 0; color: var(--ink-soft); font-size: .96rem; max-wid
 .checklist .txt b { font-weight: 600; }
 .checklist .qty { color: var(--ink-soft); }
 .checklist .forwhat { display: block; font-size: .76rem; color: var(--ink-faint); }
+/* The food-safety note under a cooked prep step (set by planner-core's buildPrep). */
+.checklist .prep-safe { display: block; margin-top: 2px; font-size: .78rem; line-height: 1.4;
+  color: var(--green-dark); border-left: 2px solid var(--green); padding-left: 8px; }
 .checklist .txt.rule { border-bottom: 1px solid var(--line); min-height: 1.3em; display: block; }
 .blank-lines li { padding: 7px 0; }
 
@@ -439,7 +442,42 @@ details p { margin: 12px 0 0; color: var(--ink-soft); font-size: .96rem; max-wid
   .plan-table th, .plan-table td { padding: 7px 6px; }
   .nights dd { color: #333; }
   a[href]::after { content: ""; }
-  @page { margin: 14mm; }
+  @page { margin: 12mm; }
+
+  /* The pages promise "the week on one sheet, the grocery list on the other",
+     so the printed sheet has to actually fit two pages at Letter and A4. The
+     screen version is roomy on purpose; print tightens every vertical gap
+     rather than shrinking the text to something a kitchen cannot read.
+     check-site has a page-count check that fails if this stops being true. */
+  body { font-size: 9.6pt; }
+  .sheet-head { padding-bottom: 8px; margin-bottom: 12px; }
+  .sheet-head h2 { font-size: 1.32rem; }
+  .sheet-head .sheet-sub { font-size: .8rem; }
+  .sheet-head.second { margin-top: 0; }
+  .plan-table th, .plan-table td { padding: 4px 6px; }
+  .plan-table td.m { font-size: .98rem; }
+  .tonight { margin-top: 15px; }
+  .tonight h3, .prep-block h3, .gsec h3 { margin-bottom: 6px; }
+  .nights dt { margin-top: 7px; font-size: .86rem; }
+  .nights dd { font-size: .85rem; line-height: 1.34; }
+  .prep-block { margin-top: 15px; padding: 11px 14px; }
+  .prep-block .prep-rule { margin-top: 6px; font-size: .76rem; }
+  .checklist li { padding: 2px 0; }
+  .checklist .txt { font-size: .88rem; line-height: 1.32; }
+  .checklist .prep-safe { font-size: .76rem; line-height: 1.3; }
+  .blank-lines li { padding: 4px 0; }
+  /* On screen the list is a 2x4 grid, which leaves a tall gap next to the long
+     pantry column. In print it becomes two balanced text columns instead, so
+     the whole list packs onto one page without shrinking anything. */
+  .glist { display: block; columns: 2; column-gap: 30px; }
+  /* Sections may flow across the column break so the two columns balance
+     evenly (a whole-section break-inside:avoid left one column 90% full and
+     pushed the footer onto a third page). A heading never ends a column, and
+     an item never splits. */
+  .gsec { margin-bottom: 9px; break-inside: auto; page-break-inside: auto; }
+  .gsec h3 { break-after: avoid; page-break-after: avoid; }
+  .checklist li { break-inside: avoid; page-break-inside: avoid; }
+  .sheet-foot { margin-top: 11px; padding-top: 8px; font-size: .68rem; line-height: 1.35; }
 }
 
 .sheet-foot { margin: 26px 0 0; padding-top: 14px; border-top: 1px solid var(--line-soft); font-size: .8rem; color: var(--ink-faint); }

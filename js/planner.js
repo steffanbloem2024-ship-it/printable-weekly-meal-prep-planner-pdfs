@@ -249,7 +249,7 @@
       meta.appendChild(el('span', 'hands', d.hands));
       card.appendChild(meta);
 
-      card.appendChild(el('p', 'dprep', d.prep));
+      card.appendChild(el('p', 'dprep', core.prepText(d)));
       card.addEventListener('click', function () { toggle(d); });
       grid.appendChild(card);
     });
@@ -340,6 +340,7 @@
         var li = el('li', null);
         li.appendChild(el('span', 'box', ''));
         var t = el('span', 'txt', p.text);
+        if (p.note) t.appendChild(el('span', 'prep-safe', p.note));
         li.appendChild(t);
         ul.appendChild(li);
       });
