@@ -464,6 +464,7 @@
     var at = bank.indexOf(d);
     if (at === -1) return;
     if (editingId === d.id) { endEdit(); clearForm(); }
+    if (fixFor === d) renderFix(null);
     var selAt = sel.indexOf(d);
     bank.splice(at, 1);
     if (selAt !== -1) sel.splice(selAt, 1);
@@ -509,8 +510,7 @@
       return s + ' — ' + byAisle[s].join(', ');
     });
     var hint = byAisle['Other / Household']
-      ? ' Anything in Other / Household was a guess: put “pantry:” or “produce:” in ' +
-        'front of a group to place it yourself.'
+      ? ' Anything in Other / Household was a guess: pick its aisle in the list below.'
       : '';
     return '“' + d.name + '” ' + where + '. Read ' + d.items.length +
            (d.items.length === 1 ? ' ingredient: ' : ' ingredients: ') + parts.join(' · ') +
@@ -527,6 +527,56 @@
    */
 
   function formNote(text) { $('own-read').textContent = text; }
+
+  /* Per-item aisle correction. After a dinner is added or saved, every
+     ingredient it read is listed with a picker for its aisle, so a wrong
+     guess is fixed by choosing the right aisle — not by retyping the line
+     with a prefix. A change rewrites that one item, saves, and redraws the
+     printed list straight away. */
+  var fixFor = null;
+
+  function renderFix(d) {
+    var box = $('own-fix');
+    box.textContent = '';
+    fixFor = d && d.items && d.items.length && bank.indexOf(d) !== -1 ? d : null;
+    if (!fixFor) { box.hidden = true; return; }
+    box.hidden = false;
+    box.appendChild(el('p', 'fix-head', 'Wrong aisle? Change any item of “' + d.name +
+      '” here — it moves on the printed grocery list straight away.'));
+    var list = el('ul', 'fix-list');
+    d.items.forEach(function (it, i) {
+      var li = el('li', 'fix-item' + (it.section === 'Other / Household' ? ' fix-guess' : ''));
+      var id = 'fix-' + i;
+      var lab = el('label', null, it.qty ? it.name + ' (' + it.qty + ')' : it.name);
+      lab.setAttribute('for', id);
+      var pick = el('select');
+      pick.id = id;
+      core.SECTIONS.forEach(function (s) {
+        var o = el('option', null, s);
+        o.value = s;
+        if (s === it.section) o.selected = true;
+        pick.appendChild(o);
+      });
+      pick.value = it.section;
+      pick.addEventListener('change', function () { setAisle(d, i, pick.value); });
+      li.appendChild(lab);
+      li.appendChild(pick);
+      list.appendChild(li);
+    });
+    box.appendChild(list);
+  }
+
+  function setAisle(d, i, section) {
+    if (bank.indexOf(d) === -1 || !d.items[i] || core.SECTIONS.indexOf(section) === -1) return;
+    var it = d.items[i];
+    if (it.section === section) return;
+    it.section = section;
+    saveBank();
+    update();
+    formNote('Moved ' + it.name + ' to ' + section + '. ' +
+      describeOwn(d, sel.indexOf(d) !== -1 ? 'is on this week' : 'is in your dinners'));
+    renderFix(d);
+  }
 
   function clearForm() {
     $('own-input').value = '';
@@ -547,6 +597,7 @@
     $('own-prep').value = d.prep || '';
     $('own-add').textContent = 'Save changes';
     $('own-cancel').hidden = false;
+    renderFix(null);
     renderBank();
     formNote('Editing “' + d.name + '”. The word before each group is the aisle it goes to — ' +
              'change it to move those items. Saving keeps this dinner in your week if it is in it.');
@@ -561,6 +612,7 @@
     endEdit();
     clearForm();
     renderBank();
+    renderFix(null);
     formNote('Edit cancelled — nothing changed.');
   }
 
@@ -591,6 +643,7 @@
         formNote(describeOwn(old, sel.indexOf(old) !== -1
           ? 'updated — it is on this week'
           : 'updated and kept in your dinners'));
+        renderFix(old);
         return;
       }
       endEdit();   // it was deleted mid-edit: fall through and add it as new
@@ -606,6 +659,7 @@
     formNote(describeOwn(d, added
       ? 'added to this week'
       : 'saved to your dinners — this week is already full'));
+    renderFix(d);
   }
 
   /* --------------------------------------- the dinner bank, as plain text

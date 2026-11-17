@@ -319,6 +319,17 @@ details p { margin: 12px 0 0; color: var(--ink-soft); font-size: .96rem; max-wid
 }
 
 /* "Your dinners" — the family's own, typed in and kept in their browser */
+.own-fix { margin-top: 10px; }
+.own-fix .fix-head { font-size: .9rem; margin: 0 0 8px; }
+.fix-list { list-style: none; margin: 0; padding: 0; display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 6px 14px; }
+.fix-item { display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  font-size: .88rem; padding: 4px 0; border-bottom: 1px dotted var(--line, #ddd); }
+.fix-item label { flex: 1; min-width: 0; overflow-wrap: anywhere; font-weight: 400; }
+.fix-item select { font: inherit; font-size: .82rem; padding: 3px 4px; width: 150px; flex: none; }
+.fix-guess label { font-weight: 600; color: var(--ink); }
+.fix-guess select { outline: 2px solid var(--green-soft); }
+@media print { .own-fix { display: none !important; } }
 .own-bank { margin-top: 26px; }
 .own-bank h3 { font-family: var(--serif); font-size: 1.12rem; margin: 0 0 10px; }
 .dcard.is-own {
