@@ -352,7 +352,11 @@
       var text = typeof st === 'string' ? st : (st && st.text) || '';
       text = String(text).replace(/\s+/g, ' ').trim();
       if (!text) return;
-      out.push({ text: text, cooked: !!(st && st.cooked) });
+      // A dinner the family typed in keeps its prep as a plain string, because
+      // that string is what the form edits and the text export round-trips.
+      // Its cooked flag therefore rides on the dinner (d.prepCooked) instead
+      // of on the step, and means exactly the same thing to buildPrep.
+      out.push({ text: text, cooked: !!(st && st.cooked) || !!(d && d.prepCooked) });
     });
     return out;
   }
@@ -452,6 +456,41 @@
     'other': O, 'household': O, 'other / household': O, 'misc': O, 'drinks': O, 'cleaning': O
   };
 
+  /* Aisles the family has corrected by hand, keyed by lowercased ingredient
+   * name. A correction is a fact about where that thing lives in THEIR shop,
+   * and it is worth more than any rule here, so it wins over both the keyword
+   * rules and our own ingredient list. The planner owns the storage (one
+   * localStorage key, never uploaded) and hands the map back in on load;
+   * core only owns the lookup order, which is the testable part.
+   */
+  var LEARNED = {};
+
+  function learnSection(name, section) {
+    var n = String(name == null ? '' : name).toLowerCase().trim();
+    if (!n || n.length > 44 || SECTIONS.indexOf(section) === -1) return false;
+    LEARNED[n] = section;
+    return true;
+  }
+
+  function setLearnedSections(map) {
+    LEARNED = {};
+    if (map) Object.keys(map).forEach(function (k) { learnSection(k, map[k]); });
+    return learnedSections();
+  }
+
+  function learnedSections() {
+    var out = {};
+    Object.keys(LEARNED).forEach(function (k) { out[k] = LEARNED[k]; });
+    return out;
+  }
+
+  function learnedSection(name) {
+    var n = String(name == null ? '' : name).toLowerCase().trim();
+    return LEARNED[n] || '';
+  }
+
+  function forgetSections() { LEARNED = {}; }
+
   // Ingredients already in our own twenty dinners keep their aisle, so a typed
   // "cheddar" merges with our cheddar instead of starting a second line.
   var KNOWN = null;
@@ -501,6 +540,7 @@
   function guessSection(name) {
     var n = String(name == null ? '' : name).toLowerCase().trim();
     if (!n) return O;
+    if (LEARNED[n]) return LEARNED[n];     // the family already fixed this one
     var known = knownSections();
     if (known[n]) return known[n];
     return rulesSection(n);
@@ -632,7 +672,10 @@
 
   function dinnerToText(d) {
     var out = ['# ' + String((d && d.name) || '').replace(/\s+/g, ' ').trim()];
-    if (d && d.prep) out.push('prep: ' + String(d.prep).replace(/\s+/g, ' ').trim());
+    if (d && d.prep) {
+      out.push('prep' + (d.prepCooked ? ' (cooked)' : '') + ': ' +
+               String(d.prep).replace(/\s+/g, ' ').trim());
+    }
     var items = itemsToText(d && d.items);
     if (items) out.push(items);
     return out.join('\n');
@@ -656,17 +699,24 @@
       var h = /^\s*#+\s*(.+)$/.exec(line);
       if (h) {
         var nm = h[1].replace(/\s+/g, ' ').trim().slice(0, MAX_NAME_LEN);
-        cur = nm ? { name: nm, prep: '', lines: [] } : null;
+        cur = nm ? { name: nm, prep: '', prepCooked: false, lines: [] } : null;
         if (cur) blocks.push(cur);
         return;
       }
       if (!cur) return;
-      var p = /^\s*prep\s*:\s*(.+)$/i.exec(line);
-      if (p) { cur.prep = p[1].replace(/\s+/g, ' ').trim().slice(0, MAX_PREP_LEN); return; }
+      var p = /^\s*prep\s*(\(\s*cooked\s*\))?\s*:\s*(.+)$/i.exec(line);
+      if (p) {
+        cur.prep = p[2].replace(/\s+/g, ' ').trim().slice(0, MAX_PREP_LEN);
+        cur.prepCooked = !!p[1];
+        return;
+      }
       if (line.trim()) cur.lines.push(line);
     });
     return blocks.map(function (b) {
-      return { name: b.name, prep: b.prep, items: parseIngredients(b.lines.join('\n')) };
+      return {
+        name: b.name, prep: b.prep, prepCooked: !!b.prepCooked,
+        items: parseIngredients(b.lines.join('\n'))
+      };
     });
   }
 
@@ -688,6 +738,11 @@
     byId: byId,
     guessSection: guessSection,
     rulesSection: rulesSection,
+    learnSection: learnSection,
+    setLearnedSections: setLearnedSections,
+    learnedSections: learnedSections,
+    learnedSection: learnedSection,
+    forgetSections: forgetSections,
     parseItem: parseItem,
     parseIngredients: parseIngredients,
     itemsToText: itemsToText,

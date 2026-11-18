@@ -14,6 +14,7 @@
   var KEY = 'prepsheet.week.v2';
   var OLD_KEY = 'prepsheet.week.v1';   // migrated on first load, then removed
   var BANK_KEY = 'prepsheet.bank.v1';
+  var AISLE_KEY = 'prepsheet.aisles.v1';   // aisles the family corrected by hand
   var DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
   var MAX = core.MAX;
   var MAX_BANK = 40;     // saved own dinners: a cap so a bad paste cannot fill localStorage
@@ -28,8 +29,9 @@
 
   /* ----------------------------------------------------------- persistence
    * Two things are stored, both in this browser only:
-   *   prepsheet.week.v2  — the five dinners chosen, in day order
-   *   prepsheet.bank.v1  — "your dinners": the ones the family typed in
+   *   prepsheet.week.v2   — the five dinners chosen, in day order
+   *   prepsheet.bank.v1   — "your dinners": the ones the family typed in
+   *   prepsheet.aisles.v1 — every aisle they have corrected, by item name
    * Nothing is uploaded; there is no account and no server to upload to.
    */
 
@@ -45,14 +47,39 @@
     try {
       if (!bank.length) { localStorage.removeItem(BANK_KEY); return; }
       localStorage.setItem(BANK_KEY, JSON.stringify(bank.map(function (d) {
-        return { id: d.id, name: d.name, prep: d.prep, items: d.items };
+        return {
+          id: d.id, name: d.name, prep: d.prep, prepCooked: !!d.prepCooked, items: d.items
+        };
       })));
     } catch (e) {}
   }
 
+  /* The aisle memory. Correcting "tahini" to Pantry once is a fact about this
+     family's supermarket, so the next dinner that mentions tahini should not
+     ask again. Kept in this browser like everything else here. */
+  function saveAisles() {
+    try {
+      var map = core.learnedSections();
+      if (!Object.keys(map).length) { localStorage.removeItem(AISLE_KEY); return; }
+      localStorage.setItem(AISLE_KEY, JSON.stringify(map));
+    } catch (e) {}
+  }
+
+  function loadAisles() {
+    var raw = null, data = null;
+    try { raw = localStorage.getItem(AISLE_KEY); } catch (e) {}
+    if (raw) { try { data = JSON.parse(raw); } catch (e) { data = null; } }
+    if (!data || typeof data !== 'object' || Array.isArray(data)) data = null;
+    // Always set it, even to nothing: whatever is in this browser's store is
+    // the whole truth, so a cleared or corrupt store must leave no memory.
+    core.setLearnedSections(data);
+  }
+
+  function aisleCount() { return Object.keys(core.learnedSections()).length; }
+
   /* A dinner the family typed in. `items` may be empty: a name alone still
      earns a place on the plan, it just leaves blank lines on the list. */
-  function makeOwn(name, items, id, prep) {
+  function makeOwn(name, items, id, prep, prepCooked) {
     var clean = [];
     (items || []).slice(0, core.MAX_OWN_ITEMS).forEach(function (it) {
       if (!it || typeof it.name !== 'string' || !it.name.trim()) return;
@@ -76,6 +103,9 @@
       // An own dinner's prep note goes through buildPrep exactly like ours, so
       // "soak the beans overnight" lands in the printed Sunday prep block.
       prep: String(prep == null ? '' : prep).replace(/\s+/g, ' ').trim().slice(0, core.MAX_PREP_LEN),
+      // Marked by the family as a step that COOKS food, so buildPrep works out
+      // how old it would be by the night that needs it, exactly as for ours.
+      prepCooked: !!prepCooked,
       items: clean
     };
   }
@@ -93,7 +123,7 @@
     if (!Array.isArray(data)) return;
     data.slice(0, MAX_BANK).forEach(function (e) {
       if (!e || typeof e.name !== 'string' || !e.name.trim()) return;
-      bank.push(makeOwn(e.name, Array.isArray(e.items) ? e.items : [], e.id, e.prep));
+      bank.push(makeOwn(e.name, Array.isArray(e.items) ? e.items : [], e.id, e.prep, e.prepCooked));
     });
   }
 
@@ -445,7 +475,10 @@
       pick.appendChild(el('p', 'dprep', d.items.length
         ? d.items.map(function (it) { return it.name; }).join(', ')
         : 'Goes on the plan; the grocery list leaves blank lines for it.'));
-      if (d.prep) pick.appendChild(el('p', 'dprep own-prepnote', 'Prep ahead: ' + d.prep));
+      if (d.prep) {
+        pick.appendChild(el('p', 'dprep own-prepnote', 'Prep ahead: ' + d.prep +
+          (d.prepCooked ? ' (cooks food)' : '')));
+      }
       pick.addEventListener('click', function () { toggle(d); });
       card.appendChild(pick);
 
@@ -493,10 +526,14 @@
   /* Say out loud how the typed ingredients were read, including which aisle
      each went to. A silent guess the user cannot see is a guess they cannot
      correct. */
-  function describeOwn(d, where) {
+  function describeOwn(d, where, skipMemo) {
     var tail = d.prep
       ? ' Prep-ahead step saved: “' + d.prep + '” — it joins the prep block on the printed sheet.'
       : '';
+    if (d.prep && d.prepCooked) {
+      tail += ' You marked it as cooking food, so the prep block says what to do if the night ' +
+              'that needs it falls more than three days after prep day.';
+    }
     if (!d.items.length) {
       return '“' + d.name + '” ' + where + '. No ingredients read, so the printed list ' +
              'leaves blank lines for it.' + tail;
@@ -512,9 +549,18 @@
     var hint = byAisle['Other / Household']
       ? ' Anything in Other / Household was a guess: pick its aisle in the list below.'
       : '';
+    // Items whose aisle came from a correction made earlier: say so, because a
+    // remembered answer the user cannot see is one they cannot unlearn.
+    var recalled = skipMemo ? [] : d.items.filter(function (it) {
+      return core.learnedSection(it.name) === it.section;
+    }).map(function (it) { return it.name; });
+    var memo = recalled.length
+      ? ' ' + recalled.slice(0, 4).join(', ') + (recalled.length > 4 ? ' and others' : '') +
+        ' went to the aisle you picked for ' + (recalled.length === 1 ? 'it' : 'them') + ' before.'
+      : '';
     return '“' + d.name + '” ' + where + '. Read ' + d.items.length +
            (d.items.length === 1 ? ' ingredient: ' : ' ingredients: ') + parts.join(' · ') +
-           '.' + hint + tail;
+           '.' + hint + memo + tail;
   }
 
 
@@ -571,17 +617,47 @@
     var it = d.items[i];
     if (it.section === section) return;
     it.section = section;
+    // Remember it by name, so the next dinner that mentions the same thing
+    // starts in the right aisle instead of asking again.
+    var learned = core.learnSection(it.name, section);
     saveBank();
+    if (learned) saveAisles();
     update();
-    formNote('Moved ' + it.name + ' to ' + section + '. ' +
-      describeOwn(d, sel.indexOf(d) !== -1 ? 'is on this week' : 'is in your dinners'));
+    formNote('Moved ' + it.name + ' to ' + section + '.' +
+      (learned ? ' Remembered, so ' + it.name.toLowerCase() + ' goes there in your next dinner too.' : '') +
+      ' ' + describeOwn(d, sel.indexOf(d) !== -1 ? 'is on this week' : 'is in your dinners', true));
     renderFix(d);
+    renderAisleMem();
+  }
+
+  /* What the aisle memory holds, and a way to drop it. Anything a page
+     remembers about you has to be visible and removable in one click. */
+  function renderAisleMem() {
+    var box = $('aisle-mem');
+    if (!box) return;
+    box.textContent = '';
+    var n = aisleCount();
+    if (!n) { box.hidden = true; return; }
+    box.hidden = false;
+    box.appendChild(el('span', null, 'Aisles you have corrected: ' + n +
+      (n === 1 ? ' ingredient' : ' ingredients') + '. New dinners reuse them, in this browser only. '));
+    var forget = el('button', 'linkish', 'Forget them');
+    forget.type = 'button';
+    forget.addEventListener('click', function () {
+      core.forgetSections();
+      try { localStorage.removeItem(AISLE_KEY); } catch (e) {}
+      renderAisleMem();
+      formNote('Forgotten — aisles are guessed from the name again. The dinners you have already ' +
+        'saved keep the aisles they have; only new ones are affected.');
+    });
+    box.appendChild(forget);
   }
 
   function clearForm() {
     $('own-input').value = '';
     $('own-items').value = '';
     $('own-prep').value = '';
+    $('own-prep-cooked').checked = false;
   }
 
   function endEdit() {
@@ -595,6 +671,7 @@
     $('own-input').value = d.name;
     $('own-items').value = core.itemsToText(d.items);
     $('own-prep').value = d.prep || '';
+    $('own-prep-cooked').checked = !!d.prepCooked;
     $('own-add').textContent = 'Save changes';
     $('own-cancel').hidden = false;
     renderFix(null);
@@ -620,6 +697,7 @@
     var name = ($('own-input').value || '').trim();
     var itemsText = $('own-items').value || '';
     var prep = ($('own-prep').value || '').trim();
+    var prepCooked = !!$('own-prep-cooked').checked && !!prep;
     if (!name) {
       formNote('Give the dinner a name first — then its ingredients underneath, ' +
         'if you want them on the grocery list.');
@@ -632,9 +710,10 @@
       if (old) {
         // Rewrite the SAME object, so a week that already contains this dinner
         // keeps it (and its printed list updates) instead of losing the night.
-        var fresh = makeOwn(name, items, old.id, prep);
+        var fresh = makeOwn(name, items, old.id, prep, prepCooked);
         old.name = fresh.name;
         old.prep = fresh.prep;
+        old.prepCooked = fresh.prepCooked;
         old.items = fresh.items;
         endEdit();
         clearForm();
@@ -649,7 +728,7 @@
       endEdit();   // it was deleted mid-edit: fall through and add it as new
     }
 
-    var d = makeOwn(name, items, null, prep);
+    var d = makeOwn(name, items, null, prep, prepCooked);
     bank.push(d);
     saveBank();
     var added = sel.length < MAX;
@@ -695,7 +774,7 @@
         if (b.name.toLowerCase() === pd.name.toLowerCase()) clash = true;
       });
       if (clash) { dupes.push(pd.name); return; }
-      bank.push(makeOwn(pd.name, pd.items, null, pd.prep));
+      bank.push(makeOwn(pd.name, pd.items, null, pd.prep, pd.prepCooked));
       added++;
     });
     saveBank();
@@ -821,7 +900,9 @@
         function () { note.textContent = 'Could not copy automatically — use the print button instead.'; });
     });
 
+    loadAisles();      // before the bank, so a reparse never undoes a correction
     loadBank();
+    renderAisleMem();
     if (!loadFromQuery()) load();
     update();
   }

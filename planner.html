@@ -111,7 +111,8 @@
         &middot;
         <a href="planner.html?week=taco-night,quesadillas,burrito-bowls,breakfast-dinner,pizza-night">a kids-help-cook week</a>
         &mdash; then swap anything you like. Each one is also
-        <a href="weeks/index.html">written out as a finished page you can just print</a>.</p>
+        <a href="weeks/index.html">written out as a finished page you can just print</a>, and there is
+        <a href="weeks/one-shop-two-weeks.html">a two-week plan from one shop</a>.</p>
 
       <div class="dinner-grid" id="grid"></div>
 
@@ -131,7 +132,11 @@
         <div class="own-row">
           <label class="own-lab" for="own-prep">Prep-ahead step <span class="fine">&mdash; optional, one line</span></label>
           <input id="own-prep" type="text" maxlength="120" placeholder="e.g. soak the beans the night before" autocomplete="off">
-          <p class="fine-note">If the step <em>cooks</em> something &mdash; rice, chicken, potatoes, a sauce &mdash; remember that cooked food keeps three to four days in the fridge, so a Thursday or Friday dinner wants it frozen on prep day or cooked midweek. We say that next to our own cooked steps.</p>
+          <p class="own-check">
+            <input type="checkbox" id="own-prep-cooked">
+            <label for="own-prep-cooked">This step <em>cooks</em> food &mdash; rice, chicken, potatoes, a sauce</label>
+          </p>
+          <p class="fine-note">Tick that and the printed prep block works out how old it would be by the night that needs it: cooked food keeps three to four days in the fridge, so a Thursday or Friday dinner is told to freeze that portion on prep day or cook a fresh batch midweek. It is the same note our own cooked steps get.</p>
         </div>
         <div class="own-row-btn">
           <button type="button" class="btn ghost small" id="own-add">Add this dinner</button>
@@ -145,6 +150,7 @@
           A dinner with no ingredients still goes on the plan and gets blank lines on the list.
           A prep-ahead step, if you write one, joins the Sunday prep block on the printed sheet.</p>
         <div class="own-fix" id="own-fix" hidden></div>
+        <p class="fine-note" id="aisle-mem" hidden></p>
       </div>
 
       <div class="own-bank" id="bank" hidden>
@@ -276,7 +282,10 @@ produce: 3 carrots, celery"></textarea>
         Quantities are read if you write them and <b>added to ours</b>, so an ingredient two dinners share
         becomes one line with the total instead of two lines you reconcile in the shop. Each ingredient is
         sorted into the aisle it belongs to; once the dinner is added, every ingredient is listed with its
-        aisle, and a wrong guess is fixed by picking the right one from the list. You can also place a whole
+        aisle, and a wrong guess is fixed by picking the right one from the list. Fix one and it is
+        <b>remembered by name</b>, so the next dinner you type that mentions the same thing starts in the
+        aisle you chose &mdash; the page shows how many it is holding and forgets the lot in one click.
+        You can also place a whole
         group as you type, by starting the line with an aisle &mdash; <code>pantry: rice, soy sauce</code>.</p>
       <p>Dinners you type in are kept under <b>Your dinners</b> and stay in this browser, so next week is
         picking from a list rather than typing again. They are never uploaded: there is no account here and
@@ -286,7 +295,9 @@ produce: 3 carrots, celery"></textarea>
         with its ingredients written out aisle by aisle, so fixing a typo or adding the thing you forgot
         takes a second and keeps the dinner in the week it is already in. You can also give a dinner a
         <b>prep-ahead step</b> (&ldquo;soak the beans the night before&rdquo;), and it joins the Sunday prep
-        block on the printed sheet alongside ours.</p>
+        block on the printed sheet alongside ours. If that step cooks something, tick the box next to it:
+        the prep block then treats it like our own cooked steps and tells you, on the page, what to do when
+        the night that needs it is four or five days after prep day.</p>
       <p>And because they live in one browser, you can <b>copy all your dinners out as plain text</b> and
         paste them back in anywhere &mdash; a new laptop, a partner&rsquo;s phone, or just a note you keep
         in case you clear your cache. Still no account, still nothing uploaded; the text is yours and it
