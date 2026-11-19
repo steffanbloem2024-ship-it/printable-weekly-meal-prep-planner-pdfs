@@ -213,15 +213,17 @@ section.tight { padding: 40px 0; }
 .note p:last-child { margin: 0; }
 
 /* faq */
-details { border-bottom: 1px solid var(--line-soft); padding: 16px 0; }
+details { border-bottom: 1px solid var(--line-soft); }
 details summary {
   cursor: pointer; font-weight: 600; font-size: 1.02rem; list-style: none;
   display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  /* the whole row is the tap target, never just the line of text (>=44px on a phone) */
+  padding: 13px 0; min-height: 44px; box-sizing: border-box;
 }
 details summary::-webkit-details-marker { display: none; }
 details summary::after { content: "+"; color: var(--green); font-size: 1.3rem; font-weight: 400; line-height: 1; }
 details[open] summary::after { content: "–"; }
-details p { margin: 12px 0 0; color: var(--ink-soft); font-size: .96rem; max-width: 62em; }
+details p { margin: 2px 0 16px; color: var(--ink-soft); font-size: .96rem; max-width: 62em; }
 
 /* download rows */
 .dl { display: grid; gap: 12px; }
@@ -357,7 +359,7 @@ details p { margin: 12px 0 0; color: var(--ink-soft); font-size: .96rem; max-wid
 /* "wk 1 / wk 2 / both" on the two-week grocery list: which week needs this line */
 .wkb {
   display: inline-block; margin-left: 7px; padding: 0 5px;
-  font-size: .68rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
   color: var(--green-dark); background: var(--pale); border-radius: 4px; vertical-align: 2px;
 }
 @media print { .wkb { background: none; border: 1px solid #bbb; color: #333; } }
