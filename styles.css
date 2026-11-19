@@ -72,6 +72,15 @@ img, svg { max-width: 100%; }
   .nav .hide-sm { display: none; }
   .site-head .wrap { gap: 12px; }
 }
+/* Phones: the header must stay one 64px line. Without nowrap, "Free planner"
+   and the pill both broke onto two lines and spilled past the header border. */
+@media (max-width: 560px) {
+  .site-head .wrap { padding: 0 16px; gap: 10px; }
+  .site-head .nav { gap: 14px; }
+  .site-head .nav a { white-space: nowrap; font-size: .9rem; }
+  .site-head .btn.small { padding: 8px 15px; font-size: .9rem; }
+  .brand { font-size: 1.05rem; }
+}
 
 /* --------------------------------------------------------------- buttons */
 
@@ -102,7 +111,7 @@ img, svg { max-width: 100%; }
 .hero .lede { font-size: 1.16rem; color: var(--ink-soft); max-width: 34em; }
 .hero .lede strong { color: var(--ink); font-weight: 600; }
 .paper-stack { position: relative; }
-.paper-stack .sheet { display: block; border-radius: 8px; box-shadow: var(--shadow); background: #fff; }
+.paper-stack .sheet { display: block; width: 100%; height: auto; border-radius: 8px; box-shadow: var(--shadow); background: #fff; }
 .paper-stack .sheet.back {
   position: absolute; inset: 0; transform: rotate(-3.2deg) translate(-16px, 10px); z-index: 0; opacity: .85;
 }
@@ -110,7 +119,14 @@ img, svg { max-width: 100%; }
 @media (max-width: 860px) {
   .hero { padding: 44px 0 36px; }
   .hero-grid { grid-template-columns: 1fr; gap: 36px; }
-  .paper-stack { max-width: 380px; margin: 0 auto; }
+  /* NOT margin: 0 auto — an auto inline margin stops a grid item stretching, so
+     the stack sized itself to its content, and its content (an SVG with only a
+     viewBox) sizes itself to its container: the whole illustration collapsed to
+     0x0 on every phone. justify-self centres it without breaking the sizing. */
+  .paper-stack { max-width: 380px; width: 100%; justify-self: center; padding: 0 18px; }
+  /* the tilted back sheet must stay inside the phone: absolute positioning
+     ignores the padding above, so shrink and straighten it a little. */
+  .paper-stack .sheet.back { transform: rotate(-2.2deg) translate(-6px, 8px) scale(.94); }
 }
 
 /* --------------------------------------------------------------- section */

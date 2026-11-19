@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+# the repo's README, served here only because the published branch is the site
+Disallow: /printable-weekly-meal-prep-planner-pdfs/README.md
 
 Sitemap: https://steffanbloem2024-ship-it.github.io/printable-weekly-meal-prep-planner-pdfs/sitemap.xml
