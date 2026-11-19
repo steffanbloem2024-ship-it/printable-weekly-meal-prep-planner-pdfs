@@ -345,8 +345,8 @@
    * the dinner cards.
    */
   function prepSteps(d) {
-    if (!d || !d.prep) return [];
-    var raw = Array.isArray(d.prep) ? d.prep : [d.prep];
+    if (!d || (!d.prep && !d.prep2)) return [];
+    var raw = !d.prep ? [] : Array.isArray(d.prep) ? d.prep : [d.prep];
     var out = [];
     raw.forEach(function (st) {
       var text = typeof st === 'string' ? st : (st && st.text) || '';
@@ -358,6 +358,11 @@
       // of on the step, and means exactly the same thing to buildPrep.
       out.push({ text: text, cooked: !!(st && st.cooked) || !!(d && d.prepCooked) });
     });
+    // An own dinner's optional second step, with its own cooked flag.
+    if (typeof d.prep2 === 'string') {
+      var t2 = d.prep2.replace(/\s+/g, ' ').trim();
+      if (t2) out.push({ text: t2, cooked: !!d.prep2Cooked });
+    }
     return out;
   }
 
@@ -676,6 +681,10 @@
       out.push('prep' + (d.prepCooked ? ' (cooked)' : '') + ': ' +
                String(d.prep).replace(/\s+/g, ' ').trim());
     }
+    if (d && d.prep2) {
+      out.push('prep' + (d.prep2Cooked ? ' (cooked)' : '') + ': ' +
+               String(d.prep2).replace(/\s+/g, ' ').trim());
+    }
     var items = itemsToText(d && d.items);
     if (items) out.push(items);
     return out.join('\n');
@@ -699,15 +708,18 @@
       var h = /^\s*#+\s*(.+)$/.exec(line);
       if (h) {
         var nm = h[1].replace(/\s+/g, ' ').trim().slice(0, MAX_NAME_LEN);
-        cur = nm ? { name: nm, prep: '', prepCooked: false, lines: [] } : null;
+        cur = nm ? { name: nm, prep: '', prepCooked: false, prep2: '', prep2Cooked: false, lines: [] } : null;
         if (cur) blocks.push(cur);
         return;
       }
       if (!cur) return;
       var p = /^\s*prep\s*(\(\s*cooked\s*\))?\s*:\s*(.+)$/i.exec(line);
       if (p) {
-        cur.prep = p[2].replace(/\s+/g, ' ').trim().slice(0, MAX_PREP_LEN);
-        cur.prepCooked = !!p[1];
+        // First prep line is step one, second is step two, any more are
+        // ignored (the form holds two).
+        var txt = p[2].replace(/\s+/g, ' ').trim().slice(0, MAX_PREP_LEN);
+        if (!cur.prep) { cur.prep = txt; cur.prepCooked = !!p[1]; }
+        else if (!cur.prep2) { cur.prep2 = txt; cur.prep2Cooked = !!p[1]; }
         return;
       }
       if (line.trim()) cur.lines.push(line);
@@ -715,6 +727,7 @@
     return blocks.map(function (b) {
       return {
         name: b.name, prep: b.prep, prepCooked: !!b.prepCooked,
+        prep2: b.prep2, prep2Cooked: !!b.prep2Cooked,
         items: parseIngredients(b.lines.join('\n'))
       };
     });

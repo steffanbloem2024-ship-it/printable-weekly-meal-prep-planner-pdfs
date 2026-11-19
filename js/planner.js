@@ -48,7 +48,8 @@
       if (!bank.length) { localStorage.removeItem(BANK_KEY); return; }
       localStorage.setItem(BANK_KEY, JSON.stringify(bank.map(function (d) {
         return {
-          id: d.id, name: d.name, prep: d.prep, prepCooked: !!d.prepCooked, items: d.items
+          id: d.id, name: d.name, prep: d.prep, prepCooked: !!d.prepCooked,
+          prep2: d.prep2, prep2Cooked: !!d.prep2Cooked, items: d.items
         };
       })));
     } catch (e) {}
@@ -79,7 +80,19 @@
 
   /* A dinner the family typed in. `items` may be empty: a name alone still
      earns a place on the plan, it just leaves blank lines on the list. */
-  function makeOwn(name, items, id, prep, prepCooked) {
+  function cleanPrep(t) {
+    return String(t == null ? '' : t).replace(/\s+/g, ' ').trim().slice(0, core.MAX_PREP_LEN);
+  }
+
+  /* `pp` = {prep, prepCooked, prep2, prep2Cooked}. Up to two prep-ahead steps,
+     each with its own "cooks food" tick, because a real dinner often has two
+     (marinate the chicken AND cook the rice) and only one of them cooks. */
+  function makeOwn(name, items, id, pp) {
+    pp = pp || {};
+    var prep = cleanPrep(pp.prep), prepCooked = !!pp.prepCooked && !!prep;
+    var prep2 = cleanPrep(pp.prep2), prep2Cooked = !!pp.prep2Cooked && !!prep2;
+    // A second step with no first one is just a first step.
+    if (!prep && prep2) { prep = prep2; prepCooked = prep2Cooked; prep2 = ''; prep2Cooked = false; }
     var clean = [];
     (items || []).slice(0, core.MAX_OWN_ITEMS).forEach(function (it) {
       if (!it || typeof it.name !== 'string' || !it.name.trim()) return;
@@ -102,10 +115,12 @@
       time: '', hands: 'Your own', night: '',
       // An own dinner's prep note goes through buildPrep exactly like ours, so
       // "soak the beans overnight" lands in the printed Sunday prep block.
-      prep: String(prep == null ? '' : prep).replace(/\s+/g, ' ').trim().slice(0, core.MAX_PREP_LEN),
+      prep: prep,
       // Marked by the family as a step that COOKS food, so buildPrep works out
       // how old it would be by the night that needs it, exactly as for ours.
-      prepCooked: !!prepCooked,
+      prepCooked: prepCooked,
+      prep2: prep2,
+      prep2Cooked: prep2Cooked,
       items: clean
     };
   }
@@ -123,7 +138,7 @@
     if (!Array.isArray(data)) return;
     data.slice(0, MAX_BANK).forEach(function (e) {
       if (!e || typeof e.name !== 'string' || !e.name.trim()) return;
-      bank.push(makeOwn(e.name, Array.isArray(e.items) ? e.items : [], e.id, e.prep, e.prepCooked));
+      bank.push(makeOwn(e.name, Array.isArray(e.items) ? e.items : [], e.id, e));
     });
   }
 
@@ -477,7 +492,8 @@
         : 'Goes on the plan; the grocery list leaves blank lines for it.'));
       if (d.prep) {
         pick.appendChild(el('p', 'dprep own-prepnote', 'Prep ahead: ' + d.prep +
-          (d.prepCooked ? ' (cooks food)' : '')));
+          (d.prepCooked ? ' (cooks food)' : '') +
+          (d.prep2 ? ' Then: ' + d.prep2 + (d.prep2Cooked ? ' (cooks food)' : '') : '')));
       }
       pick.addEventListener('click', function () { toggle(d); });
       card.appendChild(pick);
@@ -527,10 +543,13 @@
      each went to. A silent guess the user cannot see is a guess they cannot
      correct. */
   function describeOwn(d, where, skipMemo) {
-    var tail = d.prep
+    var tail = d.prep2
+      ? ' Prep-ahead steps saved: “' + d.prep + '” and “' + d.prep2 +
+        '” — both join the prep block on the printed sheet.'
+      : d.prep
       ? ' Prep-ahead step saved: “' + d.prep + '” — it joins the prep block on the printed sheet.'
       : '';
-    if (d.prep && d.prepCooked) {
+    if (d.prepCooked || d.prep2Cooked) {
       tail += ' You marked it as cooking food, so the prep block says what to do if the night ' +
               'that needs it falls more than three days after prep day.';
     }
@@ -658,6 +677,8 @@
     $('own-items').value = '';
     $('own-prep').value = '';
     $('own-prep-cooked').checked = false;
+    $('own-prep2').value = '';
+    $('own-prep2-cooked').checked = false;
   }
 
   function endEdit() {
@@ -672,6 +693,8 @@
     $('own-items').value = core.itemsToText(d.items);
     $('own-prep').value = d.prep || '';
     $('own-prep-cooked').checked = !!d.prepCooked;
+    $('own-prep2').value = d.prep2 || '';
+    $('own-prep2-cooked').checked = !!d.prep2Cooked;
     $('own-add').textContent = 'Save changes';
     $('own-cancel').hidden = false;
     renderFix(null);
@@ -698,6 +721,10 @@
     var itemsText = $('own-items').value || '';
     var prep = ($('own-prep').value || '').trim();
     var prepCooked = !!$('own-prep-cooked').checked && !!prep;
+    var pp = {
+      prep: prep, prepCooked: prepCooked,
+      prep2: ($('own-prep2').value || '').trim(), prep2Cooked: !!$('own-prep2-cooked').checked
+    };
     if (!name) {
       formNote('Give the dinner a name first — then its ingredients underneath, ' +
         'if you want them on the grocery list.');
@@ -710,10 +737,12 @@
       if (old) {
         // Rewrite the SAME object, so a week that already contains this dinner
         // keeps it (and its printed list updates) instead of losing the night.
-        var fresh = makeOwn(name, items, old.id, prep, prepCooked);
+        var fresh = makeOwn(name, items, old.id, pp);
         old.name = fresh.name;
         old.prep = fresh.prep;
         old.prepCooked = fresh.prepCooked;
+        old.prep2 = fresh.prep2;
+        old.prep2Cooked = fresh.prep2Cooked;
         old.items = fresh.items;
         endEdit();
         clearForm();
@@ -728,7 +757,7 @@
       endEdit();   // it was deleted mid-edit: fall through and add it as new
     }
 
-    var d = makeOwn(name, items, null, prep, prepCooked);
+    var d = makeOwn(name, items, null, pp);
     bank.push(d);
     saveBank();
     var added = sel.length < MAX;
@@ -774,7 +803,7 @@
         if (b.name.toLowerCase() === pd.name.toLowerCase()) clash = true;
       });
       if (clash) { dupes.push(pd.name); return; }
-      bank.push(makeOwn(pd.name, pd.items, null, pd.prep, pd.prepCooked));
+      bank.push(makeOwn(pd.name, pd.items, null, pd));
       added++;
     });
     saveBank();
