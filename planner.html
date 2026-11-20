@@ -75,6 +75,8 @@
 <section class="tool no-print" id="build" hidden>
   <div class="wrap">
 
+    <p class="link-banner" id="link-banner" role="status" hidden></p>
+
     <div class="step">
       <h2><span class="num">1</span> Choose five dinners</h2>
       <p class="step-note">These are the twenty dinners from the Starter Rotations &mdash; tap to add.
@@ -200,10 +202,18 @@ produce: 3 carrots, celery"></textarea>
       <div class="tool-actions">
         <button type="button" class="btn primary" id="print">Print the plan &amp; list</button>
         <button type="button" class="btn ghost" id="copy">Copy grocery list</button>
+        <button type="button" class="btn ghost" id="share">Copy a link to this week</button>
         <button type="button" class="btn ghost" id="reset">Start over</button>
       </div>
       <p class="fine-note" id="copy-note" aria-live="polite">Your week is saved in this browser only
         &mdash; no account, no server, no cookies for tracking. Clearing site data clears it.</p>
+      <p class="fine-note" id="share-note" aria-live="polite">&ldquo;Copy a link to this week&rdquo; is for
+        the other adult in the house: the link opens this exact week on their phone &mdash; your order of
+        nights, your own dinners, the same merged grocery list &mdash; with nothing to install and no
+        account. The week is packed into the link itself, in the part after the <code>#</code>, which
+        browsers never send to any server; we have no server to send it to. The flip side, plainly:
+        whoever holds that link, and whatever app carried it, can read the dinners in it.</p>
+      <textarea id="share-box" class="share-box" rows="3" readonly hidden aria-label="Link to this week"></textarea>
     </div>
 
   </div>
@@ -274,10 +284,11 @@ produce: 3 carrots, celery"></textarea>
           one line with the total, not two lines you have to reconcile in the shop.</p>
       </div>
       <div class="card">
-        <h3>3. Print it for the fridge</h3>
+        <h3>3. Print it &mdash; or send it</h3>
         <p>One sheet with the week, the on-the-night instructions and the prep block; one sheet
           with the grocery list. Half the mental load of dinner is being the only person who
-          knows the answer &mdash; a posted plan ends the question.</p>
+          knows the answer &mdash; a posted plan ends the question, and &ldquo;Copy a link to this
+          week&rdquo; puts the same plan and list on the phone of whoever is doing the shopping.</p>
       </div>
     </div>
 
@@ -308,6 +319,24 @@ produce: 3 carrots, celery"></textarea>
         paste them back in anywhere &mdash; a new laptop, a partner&rsquo;s phone, or just a note you keep
         in case you clear your cache. Still no account, still nothing uploaded; the text is yours and it
         never leaves your device unless you send it somewhere yourself.</p>
+    </div>
+
+    <div class="note" style="margin-top:28px">
+      <h3>Send the week to whoever is shopping</h3>
+      <p>Most weeks are planned by one adult and shopped by another, and the handover is where a plan
+        dies. So step 3 has <b>Copy a link to this week</b>. Send that link by message or email and it
+        opens this exact week in their browser: your five dinners in your order of nights, the dinners
+        you typed in yourself, the same merged aisle-sorted grocery list, ready to print or tick off in
+        the shop. Nothing to install, no account, and they can change it &mdash; it becomes their week,
+        saved in their browser, and any dinners of yours that travelled in the link are added to their
+        &ldquo;Your dinners&rdquo; list for next time.</p>
+      <p>How it works, because it matters: the week is packed into the link itself, after the
+        <code>#</code>. Browsers never send that part of a URL to a server, and we do not have a server
+        to send it to &mdash; this is a plain static site. So no plan of yours is stored anywhere but the
+        browsers you choose. The flip side, said plainly: <b>whoever holds the link can read the week in
+        it</b>, as can whatever app carried the message, so treat it like any other link you send. Very
+        long weeks of typed-in dinners make long links, and a few chat apps cut those short &mdash; if
+        that happens, the page tells you the length and you can send your dinners as text instead.</p>
     </div>
 
     <div class="sec-head" style="margin-top:46px">

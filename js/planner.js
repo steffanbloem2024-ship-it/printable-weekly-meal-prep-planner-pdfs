@@ -209,6 +209,79 @@
     return true;
   }
 
+  /* A link someone sent: planner.html#w=taco-night,*0&d=…  The week rides in
+   * the fragment, which no browser sends to a server (and there is no server
+   * here anyway). Dinners the sender typed in travel inside the link, so they
+   * are added to this browser's dinner bank — by name, so opening the same
+   * link twice does not make a second copy, and an existing dinner of the
+   * same name is never overwritten by the one in the link.
+   * Returns true if it set the week.
+   */
+  var fromLink = null;   // {added:[names], kept:[names], dropped:n} for the banner
+
+  function loadFromShare() {
+    var h;
+    try { h = (typeof location !== 'undefined' && location.hash) || ''; } catch (e) { return false; }
+    if (!/(^|[#&])w=/.test(h)) return false;
+    var got = core.shareToWeek(h);
+    if (!got) return false;
+    var made = [], added = [], kept = [];
+    got.own.forEach(function (pd) {
+      var exists = null;
+      bank.forEach(function (b) {
+        if (!exists && b.name.toLowerCase() === String(pd.name || '').toLowerCase()) exists = b;
+      });
+      if (exists) { made.push(exists); kept.push(exists.name); return; }
+      if (bank.length >= MAX_BANK) { made.push(null); return; }
+      var d = makeOwn(pd.name, pd.items, null, pd);
+      bank.push(d);
+      made.push(d);
+      added.push(d.name);
+    });
+    var picked = [];
+    got.order.forEach(function (t) {
+      var d = t.id ? core.byId(t.id) : made[t.own];
+      if (d && picked.indexOf(d) === -1 && picked.length < MAX) picked.push(d);
+    });
+    if (!picked.length) return false;
+    sel = picked;
+    if (added.length) saveBank();
+    fromLink = { added: added, kept: kept, dropped: got.dropped };
+    // Drop the fragment: a reload should keep whatever they have changed since,
+    // not re-apply the link over it.
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    return true;
+  }
+
+  function renderLinkBanner() {
+    var box = $('link-banner');
+    if (!box) return;
+    if (!fromLink) { box.hidden = true; return; }
+    var bits = ['This week came from a link someone sent you. Change anything you like — it is yours now, saved in this browser.'];
+    if (fromLink.added.length) {
+      bits.push('Added to your dinners: ' + fromLink.added.join(', ') + '.');
+    }
+    if (fromLink.kept.length) {
+      bits.push('You already had ' + fromLink.kept.join(', ') +
+        ', so your own version was kept.');
+    }
+    if (fromLink.dropped) {
+      bits.push(fromLink.dropped + (fromLink.dropped === 1 ? ' dinner' : ' dinners') +
+        ' in the link could not be read, so the week is short — ask for the link again.');
+    }
+    box.textContent = bits.join(' ');
+    box.hidden = false;
+  }
+
+  /* The link for the week on screen now. */
+  function shareUrl() {
+    var frag = core.weekToShare(sel);
+    if (!frag) return '';
+    var base = '';
+    try { base = location.origin + location.pathname; } catch (e) { base = ''; }
+    return base + '#' + frag;
+  }
+
   /* --------------------------------------------------------------- filters */
 
   function isMeatFree(d) {
@@ -853,6 +926,7 @@
     if (flashTimer) { clearTimeout(flashTimer); flashTimer = null; }
     $('counter').classList.remove('is-full');
     renderCounter();
+    renderLinkBanner();
     renderGrid();
     renderBank();
     renderChosen();
@@ -915,6 +989,7 @@
     $('reset').addEventListener('click', function () {
       // Start over clears the week, never the dinners the family typed in.
       sel = [];
+      fromLink = null;
       try { localStorage.removeItem(KEY); } catch (e) {}
       endEdit();
       clearForm();
@@ -929,10 +1004,32 @@
         function () { note.textContent = 'Could not copy automatically — use the print button instead.'; });
     });
 
+    $('share').addEventListener('click', function () {
+      var note = $('share-note');
+      var url = shareUrl();
+      if (!url) { note.textContent = 'Choose a dinner first.'; return; }
+      copyText(url,
+        function () {
+          var own = sel.filter(function (d) { return d.own; }).length;
+          note.textContent = 'Link copied. Send it to whoever is shopping — it opens this exact week' +
+            (own ? ', including the ' + own + (own === 1 ? ' dinner' : ' dinners') + ' you typed in' : '') +
+            '. The week travels inside the link itself, so anyone who has the link can read it.' +
+            (url.length > 1500 ? ' It is ' + url.length + ' characters long, and some chat apps cut long links — if it arrives broken, send the plan with “Copy my dinners as text” instead.' : '');
+        },
+        function () {
+          note.textContent = 'Could not reach the clipboard. The link is in the box below — ' +
+            'select it and copy it by hand.';
+          var ta = $('share-box');
+          ta.hidden = false;
+          ta.value = url;
+          ta.select();
+        });
+    });
+
     loadAisles();      // before the bank, so a reparse never undoes a correction
     loadBank();
     renderAisleMem();
-    if (!loadFromQuery()) load();
+    if (!loadFromShare() && !loadFromQuery()) load();
     update();
   }
 

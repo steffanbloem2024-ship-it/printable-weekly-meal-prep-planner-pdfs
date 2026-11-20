@@ -733,6 +733,108 @@
     });
   }
 
+  /* ------------------------------------------------- the shareable week link
+   * One parent builds the week; another one does the shopping. Until now the
+   * only way across was the printer or a pasted block of text, so the week
+   * could not travel to a phone.
+   *
+   * weekToShare() packs the chosen week into a URL FRAGMENT — the part after
+   * the "#". Browsers never send a fragment to any server, and this site has
+   * no server to send it to, so the week rides inside the link itself and is
+   * read back by the page in whoever's browser opens it. Be straight about the
+   * trade: anyone holding the link, and whatever app carried it, can read the
+   * dinners in it.
+   *
+   * Shape:  w=<token>,<token>...[&d=<base64url of bankToText(own dinners)>]
+   * A token is either one of our dinner ids, or "*<n>" pointing at the n-th
+   * dinner in the d= block. Own dinners reuse the export format the page
+   * already teaches, so there is one serialiser to get right, not two.
+   */
+  var SHARE_OWN = '*';
+
+  function toB64url(text) {
+    var bytes, bin = '', i;
+    try {
+      bytes = new TextEncoder().encode(String(text));
+    } catch (e) { return ''; }
+    for (i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    var b64;
+    try {
+      b64 = typeof btoa === 'function'
+        ? btoa(bin)
+        : Buffer.from(String(text), 'utf8').toString('base64');
+    } catch (e2) { return ''; }
+    return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  function fromB64url(code) {
+    var b64 = String(code || '').replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    var bin;
+    try {
+      bin = typeof atob === 'function' ? atob(b64) : null;
+    } catch (e) { return ''; }
+    try {
+      if (bin === null) return Buffer.from(b64, 'base64').toString('utf8');
+      var bytes = new Uint8Array(bin.length), i;
+      for (i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return new TextDecoder().decode(bytes);
+    } catch (e2) { return ''; }
+  }
+
+  /* list: the chosen dinners in day order. Ours are recognised by id; anything
+     with .own is packed whole. Returns '' for an empty week. */
+  function weekToShare(list) {
+    var tokens = [], own = [];
+    (list || []).slice(0, 5).forEach(function (d) {
+      if (!d) return;
+      if (!d.own && byId(d.id)) { tokens.push(d.id); return; }
+      if (!d.name) return;
+      tokens.push(SHARE_OWN + own.length);
+      own.push(d);
+    });
+    if (!tokens.length) return '';
+    var frag = 'w=' + tokens.join(',');
+    if (own.length) {
+      var code = toB64url(bankToText(own));
+      if (!code) return 'w=' + tokens.filter(function (t) {
+        return t.charAt(0) !== SHARE_OWN;
+      }).join(',');
+      frag += '&d=' + code;
+    }
+    return frag;
+  }
+
+  /* The inverse. Returns null for anything it cannot read, so a mangled link
+     (a chat app that ate half of it) leaves the page as it was rather than
+     half-applying a week. */
+  function shareToWeek(frag) {
+    var text = String(frag || '').replace(/^#/, '');
+    var mw = /(?:^|&)w=([^&]*)/.exec(text);
+    if (!mw) return null;
+    var md = /(?:^|&)d=([^&]*)/.exec(text);
+    var own = md ? textToDinners(fromB64url(md[1])) : [];
+    var order = [], seen = {}, bad = 0;
+    mw[1].split(',').forEach(function (tok) {
+      tok = decodeURIComponent(tok.trim());
+      if (!tok || order.length >= 5) return;
+      if (tok.charAt(0) === SHARE_OWN) {
+        var n = parseInt(tok.slice(1), 10);
+        if (!(n >= 0) || n >= own.length) { bad++; return; }
+        if (seen['o' + n]) return;
+        seen['o' + n] = true;
+        order.push({ own: n });
+        return;
+      }
+      if (!byId(tok)) { bad++; return; }
+      if (seen[tok]) return;
+      seen[tok] = true;
+      order.push({ id: tok });
+    });
+    if (!order.length) return null;
+    return { order: order, own: own, dropped: bad };
+  }
+
   function byId(id) {
     for (var k = 0; k < DINNERS.length; k++) if (DINNERS[k].id === id) return DINNERS[k];
     return null;
@@ -762,6 +864,8 @@
     dinnerToText: dinnerToText,
     bankToText: bankToText,
     textToDinners: textToDinners,
+    weekToShare: weekToShare,
+    shareToWeek: shareToWeek,
     SECTION_PREFIX: SECTION_PREFIX,
     MAX_PREP_LEN: MAX_PREP_LEN,
     MAX_NAME_LEN: MAX_NAME_LEN,
