@@ -31,6 +31,13 @@ last and says so when that crosses the 3–4-day mark for cooked rice or chicken
 Anything you type stays in your own browser's `localStorage`. Nothing is uploaded, because there is
 nothing to upload it to — the site has no server.
 
+## Engineering notes
+
+How the printables are built and tested, written up in full:
+
+- [Your page says "prints on two pages". Nothing is testing that.](https://steffanbloem2024-ship-it.github.io/printable-weekly-meal-prep-planner-pdfs/notes/print-promise.html) (also as a [Gist](https://gist.github.com/steffanbloem2024-ship-it/5d570019b22e4b381509a1494968b9e2))
+- [A 305-line PDF writer, and why I read every PDF it makes back out again](https://steffanbloem2024-ship-it.github.io/printable-weekly-meal-prep-planner-pdfs/notes/pdf-readback.html)
+
 ## Checks
 
 The tooling that generates and tests this site lives outside the published tree. It renders every
