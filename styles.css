@@ -570,3 +570,8 @@ details p { margin: 2px 0 16px; color: var(--ink-soft); font-size: .96rem; max-w
 .article pre { background: #f4f1ea; border-radius: 8px; padding: 14px 16px; overflow-x: auto; font-size: .82rem; line-height: 1.5; max-width: 100%; }
 .article code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
 .article p code, .article li code { background: #f4f1ea; padding: 1px 4px; border-radius: 4px; overflow-wrap: anywhere; }
+
+/* ------------------------------------------------- simple article tables */
+.article table.simple { width: 100%; border-collapse: collapse; margin: 1em 0 1.4em; font-size: .95rem; }
+.article table.simple th, .article table.simple td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+.article table.simple thead th { font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); border-bottom: 1px solid var(--line); }
