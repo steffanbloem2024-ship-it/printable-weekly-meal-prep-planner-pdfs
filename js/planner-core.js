@@ -408,12 +408,23 @@
    * freeze advice here is wasted words -- and it is not free: two stacked notes
    * on one prep step pushed freezer-week and pantry-week onto a third printed
    * Letter page on 2026-11-26. This variant carries only what the day-count
-   * note does not say: that rice is the stricter case, how to cool it, and the
-   * UK number. It is deliberately short enough to set on one printed line;
-   * print-check.js is the guard if that ever stops being true.
+   * note does not say: that rice is the stricter case, how to cool it, the
+   * UK number, and -- added 2026-11-27 -- what to do about it.
+   *
+   * Why the fix came back (the tension this resolves): the day-count note only
+   * gives a fix for the LATE nights ("for Friday either cook fresh or freeze").
+   * For the early ones it says "keep what Tuesday needs in the fridge", which is
+   * US arithmetic. A reader following UK guidance was therefore shown a 24-hour
+   * limit and no action for Tuesday's rice at all.
+   * "so freeze the rest" is that action, and it needs no day names, so it is
+   * true on every week. The rest of the sentence was cut down to pay for the
+   * words: a longer draft cost a second printed line and took freezer-week and
+   * pantry-week to 21px and 19px of spare room. This one keeps it to a single
+   * line, so those pages are back at 36px and 34px. print-check.js is the
+   * guard, and those two pages are where any future wording must be measured.
    */
-  var RICE_SHORT = 'Rice is stricter: cool it fast, fridge it within the hour, reheat once. ' +
-    'UK guidance says 24 hours.';
+  var RICE_SHORT = 'Rice is stricter: cool fast, fridge within the hour, reheat once. ' +
+    'UK: 24 hours, so freeze the rest.';
 
   function riceNote(text, hasDayNote) {
     if (!RICE_RE.test(String(text || ''))) return '';
