@@ -459,6 +459,7 @@
         li.appendChild(el('span', 'box', ''));
         var t = el('span', 'txt', p.text);
         if (p.note) t.appendChild(el('span', 'prep-safe', p.note));
+        if (p.rice) t.appendChild(el('span', 'prep-safe prep-rice', p.rice));
         li.appendChild(t);
         ul.appendChild(li);
       });

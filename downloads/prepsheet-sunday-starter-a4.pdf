@@ -2685,7 +2685,7 @@ endobj
 << /Type /Page /Parent 5 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 13 0 R >>
 endobj
 15 0 obj
-<< /Length 8915 >>
+<< /Length 9166 >>
 stream
 BT
 0.42 0.62 0.56 rg
@@ -3192,7 +3192,15 @@ BT
 1 0 0 1 229.76 224.752 Tm
 (A big pot of rice, pasta, or potatoes.) Tj
 1 0 0 1 229.76 213.752 Tm
-(Cool it fast, keep it covered.) Tj
+(Cool it fast and refrigerate it. Cooked) Tj
+1 0 0 1 229.76 202.752 Tm
+(rice is the strict one: US guidance) Tj
+1 0 0 1 229.76 191.752 Tm
+(says three to four days, UK) Tj
+1 0 0 1 229.76 180.752 Tm
+(guidance 24 hours. Freeze the later) Tj
+1 0 0 1 229.76 169.752 Tm
+(half on prep day.) Tj
 ET
 q
 0.72 0.75 0.75 RG
@@ -3677,16 +3685,16 @@ xref
 0000015919 00000 n 
 0000044878 00000 n 
 0000045042 00000 n 
-0000054010 00000 n 
-0000054174 00000 n 
-0000061713 00000 n 
-0000061934 00000 n 
-0000062161 00000 n 
-0000062393 00000 n 
-0000062588 00000 n 
-0000062898 00000 n 
+0000054261 00000 n 
+0000054425 00000 n 
+0000061964 00000 n 
+0000062185 00000 n 
+0000062412 00000 n 
+0000062644 00000 n 
+0000062839 00000 n 
+0000063149 00000 n 
 trailer
 << /Size 24 /Root 23 0 R /Info 22 0 R >>
 startxref
-62948
+63199
 %%EOF

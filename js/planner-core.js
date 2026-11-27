@@ -384,6 +384,42 @@
    * Prep day is the weekend before, so Monday is one day old and Friday five;
    * cooked food is good for three to four. Monday to Wednesday needs no note.
    */
+  /*
+   * Rice is the one cooked component whose guidance differs by country, and the
+   * stricter guidance is a lot stricter: Food Standards Scotland says cooked
+   * rice should be chilled "as quickly as possible, ideally within 1 hour" and
+   * eaten within 24 hours, because uncooked rice can carry Bacillus cereus
+   * spores that survive cooking. US guidance (USDA / FoodSafety.gov) treats it
+   * like any other cooked leftover at three to four days. We cannot know which
+   * country a reader is in, so any cooked prep step that mentions rice carries
+   * this note as well as the ordinary day-count one. Single source of truth:
+   * the Week Builder, the finished week pages and the PDFs all print this text.
+   */
+  var RICE_RE = /\brice\b/i;
+  var RICE_FACT = 'Cooked rice is the strict one: cool it fast, fridge it within the hour, reheat it once. ' +
+    'US guidance says three to four days, UK guidance 24 hours';
+  // The fix is only spelled out when the day-count note above has not already
+  // said it, so a late-week rice step does not print "freeze it" twice.
+  var RICE_FIX = ' \u2014 so freeze the later portions on prep day, or cook that night\u2019s rice fresh.';
+  var RICE_NOTE = RICE_FACT + RICE_FIX;
+  /*
+   * When the day-count note has already run, it has said "cooked food keeps
+   * three to four days" and what to freeze, so repeating the US number and the
+   * freeze advice here is wasted words -- and it is not free: two stacked notes
+   * on one prep step pushed freezer-week and pantry-week onto a third printed
+   * Letter page on 2026-11-26. This variant carries only what the day-count
+   * note does not say: that rice is the stricter case, how to cool it, and the
+   * UK number. It is deliberately short enough to set on one printed line;
+   * print-check.js is the guard if that ever stops being true.
+   */
+  var RICE_SHORT = 'Rice is stricter: cool it fast, fridge it within the hour, reheat once. ' +
+    'UK guidance says 24 hours.';
+
+  function riceNote(text, hasDayNote) {
+    if (!RICE_RE.test(String(text || ''))) return '';
+    return hasDayNote ? RICE_SHORT : RICE_NOTE;
+  }
+
   function cookedNote(days) {
     var early = days.filter(function (n) { return n < 3; });
     var late = days.filter(function (n) { return n >= 3; });
@@ -426,6 +462,8 @@
       var e = byText[k];
       e.days.sort(function (a, b) { return a - b; });
       e.note = e.cooked ? cookedNote(e.days) : '';
+      // A cooked rice step always carries the rice note, whatever night it feeds.
+      e.rice = e.cooked ? riceNote(e.text, !!e.note) : '';
       return e;
     });
   }
@@ -850,6 +888,10 @@
     prepSteps: prepSteps,
     prepText: prepText,
     cookedNote: cookedNote,
+    riceNote: riceNote,
+    RICE_NOTE: RICE_NOTE,
+    RICE_FACT: RICE_FACT,
+    RICE_SHORT: RICE_SHORT,
     byId: byId,
     guessSection: guessSection,
     rulesSection: rulesSection,

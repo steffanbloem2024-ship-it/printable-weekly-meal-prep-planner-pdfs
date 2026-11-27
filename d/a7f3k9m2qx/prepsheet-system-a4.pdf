@@ -2904,7 +2904,7 @@ endobj
 << /Type /Page /Parent 5 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 15 0 R >>
 endobj
 17 0 obj
-<< /Length 8915 >>
+<< /Length 9166 >>
 stream
 BT
 0.42 0.62 0.56 rg
@@ -3411,7 +3411,15 @@ BT
 1 0 0 1 229.76 224.752 Tm
 (A big pot of rice, pasta, or potatoes.) Tj
 1 0 0 1 229.76 213.752 Tm
-(Cool it fast, keep it covered.) Tj
+(Cool it fast and refrigerate it. Cooked) Tj
+1 0 0 1 229.76 202.752 Tm
+(rice is the strict one: US guidance) Tj
+1 0 0 1 229.76 191.752 Tm
+(says three to four days, UK) Tj
+1 0 0 1 229.76 180.752 Tm
+(guidance 24 hours. Freeze the later) Tj
+1 0 0 1 229.76 169.752 Tm
+(half on prep day.) Tj
 ET
 q
 0.72 0.75 0.75 RG
@@ -9597,7 +9605,7 @@ endobj
 << /Type /Page /Parent 5 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 39 0 R >>
 endobj
 41 0 obj
-<< /Length 4927 >>
+<< /Length 4965 >>
 stream
 BT
 0.42 0.62 0.56 rg
@@ -9759,9 +9767,11 @@ BT
 0.42 0.45 0.46 rg
 /F1 8.2 Tf
 1 0 0 1 363.28 506.584 Tm
-(Leftover rice, frozen peas and carrots, three) Tj
+(The rice from Monday, frozen peas and carrots,) Tj
 1 0 0 1 363.28 495.784 Tm
-(scrambled eggs, soy sauce, a little sesame oil.) Tj
+(three scrambled eggs, soy sauce, a little) Tj
+1 0 0 1 363.28 484.984 Tm
+(sesame oil.) Tj
 ET
 q
 0.86 0.88 0.88 RG
@@ -9933,7 +9943,7 @@ endobj
 << /Type /Page /Parent 5 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R /F4 4 0 R >> >> /Contents 41 0 R >>
 endobj
 43 0 obj
-<< /Length 17406 >>
+<< /Length 17916 >>
 stream
 BT
 0.42 0.62 0.56 rg
@@ -10762,30 +10772,30 @@ BT
 ET
 q
 0.933 0.957 0.949 rg
-50 296.89 m
-285.64 296.89 l
-287.849 296.89 289.64 298.681 289.64 300.89 c
+50 256.89 m
+285.64 256.89 l
+287.849 256.89 289.64 258.681 289.64 260.89 c
 289.64 412.89 l
 289.64 415.099 287.849 416.89 285.64 416.89 c
 50 416.89 l
 47.791 416.89 46 415.099 46 412.89 c
-46 300.89 l
-46 298.681 47.791 296.89 50 296.89 c
+46 260.89 l
+46 258.681 47.791 256.89 50 256.89 c
 h
 f
 Q
 q
 0.86 0.88 0.88 RG
 0.7 w
-50 296.89 m
-285.64 296.89 l
-287.849 296.89 289.64 298.681 289.64 300.89 c
+50 256.89 m
+285.64 256.89 l
+287.849 256.89 289.64 258.681 289.64 260.89 c
 289.64 412.89 l
 289.64 415.099 287.849 416.89 285.64 416.89 c
 50 416.89 l
 47.791 416.89 46 415.099 46 412.89 c
-46 300.89 l
-46 298.681 47.791 296.89 50 296.89 c
+46 260.89 l
+46 258.681 47.791 256.89 50 256.89 c
 h
 S
 Q
@@ -10807,60 +10817,84 @@ BT
 0.42 0.45 0.46 rg
 /F1 7.8 Tf
 1 0 0 1 92 382.182 Tm
-(Cook the rice.) Tj
+(Cook the rice. Use half tonight and freeze) Tj
+ET
+BT
+0.42 0.45 0.46 rg
+/F1 7.8 Tf
+1 0 0 1 92 372.182 Tm
+(Wednesday’s half flat in a bag today — cooked rice) Tj
+ET
+BT
+0.42 0.45 0.46 rg
+/F1 7.8 Tf
+1 0 0 1 92 362.182 Tm
+(is the one thing not to leave sitting in the fridge all) Tj
+ET
+BT
+0.42 0.45 0.46 rg
+/F1 7.8 Tf
+1 0 0 1 92 352.182 Tm
+(week.) Tj
 ET
 BT
 0.04 0.4 0.33 rg
 /F2 7.8 Tf
-1 0 0 1 58 367.182 Tm
+1 0 0 1 58 337.182 Tm
 (Tue) Tj
 ET
 BT
 0.42 0.45 0.46 rg
 /F1 7.8 Tf
-1 0 0 1 92 367.182 Tm
+1 0 0 1 92 337.182 Tm
 (Boil and mash the potatoes on prep day — this is the) Tj
 ET
 BT
 0.42 0.45 0.46 rg
 /F1 7.8 Tf
-1 0 0 1 92 357.182 Tm
+1 0 0 1 92 327.182 Tm
 (slow part.) Tj
 ET
 BT
 0.04 0.4 0.33 rg
 /F2 7.8 Tf
-1 0 0 1 58 342.182 Tm
+1 0 0 1 58 312.182 Tm
 (Wed) Tj
 ET
 BT
 0.42 0.45 0.46 rg
 /F1 7.8 Tf
-1 0 0 1 92 342.182 Tm
-(None.) Tj
+1 0 0 1 92 312.182 Tm
+(Move the frozen rice to the fridge on Tuesday night) Tj
+ET
+BT
+0.42 0.45 0.46 rg
+/F1 7.8 Tf
+1 0 0 1 92 302.182 Tm
+(— dried-out rice fries best; fresh rice goes gluey.) Tj
 ET
 BT
 0.04 0.4 0.33 rg
 /F2 7.8 Tf
-1 0 0 1 58 327.182 Tm
+1 0 0 1 58 287.182 Tm
 (Thu) Tj
 ET
 BT
 0.42 0.45 0.46 rg
 /F1 7.8 Tf
-1 0 0 1 92 327.182 Tm
+1 0 0 1 92 287.182 Tm
 (Dice the soup vegetables all at once on prep day.) Tj
 ET
 BT
 0.04 0.4 0.33 rg
 /F2 7.8 Tf
-1 0 0 1 58 312.182 Tm
+1 0 0 1 58 272.182 Tm
 (Fri) Tj
 ET
 BT
 0.42 0.45 0.46 rg
 /F1 7.8 Tf
-1 0 0 1 92 312.182 Tm
+1 0 0 1 92 272.182 Tm
 (Wedge the cabbage.) Tj
 ET
 q
@@ -10904,9 +10938,9 @@ BT
 0.1 0.14 0.16 rg
 /F1 8.6 Tf
 1 0 0 1 74.5 104.604 Tm
-(Cook 4 cups dry rice \(Monday burritos + Wednesday) Tj
+(Cook 4 cups dry rice: half for Monday’s burritos, half) Tj
 1 0 0 1 74.5 93.604 Tm
-(fried rice\)) Tj
+(frozen flat today for Wednesday) Tj
 ET
 q
 0.72 0.75 0.75 RG
@@ -11484,39 +11518,39 @@ xref
 0000019860 00000 n 
 0000048819 00000 n 
 0000048983 00000 n 
-0000057951 00000 n 
-0000058115 00000 n 
-0000068222 00000 n 
-0000068386 00000 n 
-0000071776 00000 n 
-0000071940 00000 n 
-0000076388 00000 n 
-0000076552 00000 n 
-0000079854 00000 n 
-0000080018 00000 n 
-0000085425 00000 n 
-0000085589 00000 n 
-0000090534 00000 n 
-0000090698 00000 n 
-0000109694 00000 n 
-0000109858 00000 n 
-0000114760 00000 n 
-0000114924 00000 n 
-0000132766 00000 n 
-0000132930 00000 n 
-0000137679 00000 n 
-0000137843 00000 n 
-0000156046 00000 n 
-0000156210 00000 n 
-0000161190 00000 n 
-0000161354 00000 n 
-0000178814 00000 n 
-0000178978 00000 n 
-0000186131 00000 n 
-0000186295 00000 n 
-0000186606 00000 n 
+0000058202 00000 n 
+0000058366 00000 n 
+0000068473 00000 n 
+0000068637 00000 n 
+0000072027 00000 n 
+0000072191 00000 n 
+0000076639 00000 n 
+0000076803 00000 n 
+0000080105 00000 n 
+0000080269 00000 n 
+0000085676 00000 n 
+0000085840 00000 n 
+0000090785 00000 n 
+0000090949 00000 n 
+0000109945 00000 n 
+0000110109 00000 n 
+0000115011 00000 n 
+0000115175 00000 n 
+0000133017 00000 n 
+0000133181 00000 n 
+0000137930 00000 n 
+0000138094 00000 n 
+0000156297 00000 n 
+0000156461 00000 n 
+0000161479 00000 n 
+0000161643 00000 n 
+0000179613 00000 n 
+0000179777 00000 n 
+0000186930 00000 n 
+0000187094 00000 n 
+0000187405 00000 n 
 trailer
 << /Size 49 /Root 48 0 R /Info 47 0 R >>
 startxref
-186656
+187455
 %%EOF
